@@ -1,0 +1,125 @@
+# Master question list — 15 questions, ordered by display priority.
+# is_stub: true = question not yet implemented (depends on a piece not yet shipped).
+# scenario: which Cinderhaven scenario this question reads.
+# IMPORTANT: figures shown must reconcile to their source_piece. Never mix scenarios silently.
+
+questions:
+  - id: q01
+    question: "Should I fire my biggest customer?"
+    short_label: "Fire your biggest account?"
+    source_piece: "Retailer Scorecard & Renegotiation Simulator"
+    go_deeper_link: "/retailer-scorecard"
+    scenario: baseline
+    is_stub: false
+
+  - id: q02
+    question: "Can I afford this retailer launch?"
+    short_label: "Afford the retailer launch?"
+    source_piece: "Cost of Saying Yes"
+    go_deeper_link: "/cost-of-saying-yes"
+    scenario: baseline
+    is_stub: false
+
+  - id: q03
+    question: "Which SKUs should die?"
+    short_label: "SKUs to kill?"
+    source_piece: "SKU Rationalization Framework"
+    go_deeper_link: "/sku-rationalization"
+    scenario: baseline
+    is_stub: false
+
+  - id: q04
+    question: "Where is my trade spend going?"
+    short_label: "Trade spend going where?"
+    source_piece: "Trade Spend Data Diagnostic"
+    go_deeper_link: "/trade-spend-diagnostic"
+    scenario: distressed        # matches linked piece — do not change without updating that piece
+    is_stub: false
+
+  - id: q05
+    question: "Why don't my numbers match my distributor's?"
+    short_label: "Numbers vs. distributor?"
+    source_piece: "EDI Reconciliation Tool"
+    go_deeper_link: "/edi-reconciliation"
+    scenario: baseline
+    is_stub: true               # depends on EDI Reconciliation v2
+
+  - id: q06
+    question: "What would a recall cost me?"
+    short_label: "What would a recall cost?"
+    source_piece: "Recall Blast Radius"
+    go_deeper_link: "/recall-blast-radius"
+    scenario: distressed
+    is_stub: true               # depends on Recall Blast Radius piece
+
+  - id: q07
+    question: "Is my product data going to break at Walmart?"
+    short_label: "Product data Walmart-ready?"
+    source_piece: "Product Data Health Audit"
+    go_deeper_link: "/product-data-health-audit"
+    scenario: baseline
+    is_stub: false
+
+  - id: q08
+    question: "What does one wrong weight cost?"
+    short_label: "Cost of wrong weight?"
+    source_piece: "Dimension & Weight Integrity"
+    go_deeper_link: "/dimension-weight-integrity"
+    scenario: baseline
+    is_stub: false
+
+  - id: q09
+    question: "Which channel actually makes money?"
+    short_label: "Which channel makes money?"
+    source_piece: "Channel Profitability Analysis"
+    go_deeper_link: "/channel-profitability"
+    scenario: baseline
+    is_stub: false
+
+  - id: q10
+    question: "Am I leaving deduction money on the table?"
+    short_label: "Leaving deduction money?"
+    source_piece: "Retailer Deduction Recovery"
+    go_deeper_link: "/retailer-deduction-recovery"
+    scenario: baseline
+    is_stub: false
+
+  - id: q11
+    question: "[TBD — Question 11]"
+    short_label: "TBD"
+    source_piece: "TBD"
+    go_deeper_link: "#"
+    scenario: baseline
+    is_stub: true
+
+  - id: q12
+    question: "[TBD — Question 12]"
+    short_label: "TBD"
+    source_piece: "TBD"
+    go_deeper_link: "#"
+    scenario: baseline
+    is_stub: true
+
+  - id: q13
+    question: "[TBD — Question 13]"
+    short_label: "TBD"
+    source_piece: "TBD"
+    go_deeper_link: "#"
+    scenario: baseline
+    is_stub: true
+
+  - id: q14
+    question: "[TBD — Question 14]"
+    short_label: "TBD"
+    source_piece: "TBD"
+    go_deeper_link: "#"
+    scenario: baseline
+    is_stub: true
+
+  - id: q15
+    question: "[TBD — Question 15]"
+    short_label: "TBD"
+    source_piece: "TBD"
+    go_deeper_link: "#"
+    scenario: baseline
+    is_stub: true

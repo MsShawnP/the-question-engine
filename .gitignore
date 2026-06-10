@@ -1,0 +1,54 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Quarto
+_quarto/
+/.quarto/
+*_files/
+*.pdf
+
+# Node / frontend tooling (if added later)
+node_modules/
+.parcel-cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.key
+credentials.*
+secrets.*
+*.pem
+*.p12
+
+# Fly.io
+.fly/

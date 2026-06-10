@@ -1,0 +1,68 @@
+# Rules thresholds per question.
+# All values calibrated from their respective source pieces.
+# Change here; the rule modules read these at runtime.
+
+q01:
+  # Should I fire my biggest customer?
+  revenue_concentration_threshold: 0.40   # > 40% of revenue = concentrated
+  deduction_burden_threshold: 0.15        # > 15% of invoiced revenue clawed back through deductions = high burden
+  target_second_account_share: 0.20       # ideal second account share (messaging only)
+
+q02:
+  # Can I afford this retailer launch?
+  breakeven_months_threshold: 18          # > 18 months to break even on promo investment = not yet
+  working_capital_buffer_months: 3        # minimum cash cushion required beyond payback period
+
+q03:
+  # Which SKUs should die?
+  margin_floor: 0.15                      # < 15% gross margin = kill candidate
+  velocity_floor_units_per_week: 5.0      # < 5 units/week/store = velocity failure
+  # Both conditions required — slow + great margin = watch, not kill
+
+q04:
+  # Where is my trade spend going? (distressed scenario)
+  unplanned_deduction_threshold: 0.25     # > 25% of gross deductions are unplanned = leakage problem
+  # Unplanned = compliance + shortage + damage + post-audit types
+
+q07:
+  # Is my product data going to break at Walmart?
+  critical_error_threshold: 0.05          # > 5% of SKUs have critical field errors = do not submit
+  warning_error_threshold: 0.02           # 2-5% = fix before next sync window
+  # Critical fields: GTIN-14 (14-digit), UPC (12-13 digit), case weight > 0, all 3 dimensions > 0
+
+q08:
+  # What does one wrong weight cost?
+  error_multiplier_annual: 52             # annualize: multiply weekly shipment rate × 52 for annual projection
+
+q10:
+  # Am I leaving deduction money on the table?
+  disputable_threshold: 0.20             # > 20% of gross deductions expired without dispute = leaving money
+  win_rate_floor: 0.50                   # < 50% dispute win rate = broken recovery process
+  # Win = dispute_outcome = 'overturned'
+
+q11:
+  # What did the orders I couldn't fill actually cost me?
+  stockout_cost_threshold: 250000        # > $250K implied stockout cost fires the verdict
+  # Stockout = active SKU-store with zero velocity in a week (in distribution but not selling)
+
+q12:
+  # Can I trust my own forecast?
+  mape_decision_grade: 20.0             # < 20% MAPE = decision-grade forecast
+  mape_warning: 30.0                    # 20–30% = needs improvement; > 30% = broken, don't plan from it
+  # Forecast proxy = fct_distribution.avg_weekly_units; actual = fct_scan_data.units_sold
+
+q13:
+  # Am I about to get hit with OTIF penalties I can't see?
+  asn_late_rate_threshold: 0.05         # > 5% late ASN rate = OTIF exposure; fires the verdict
+  penalty_per_asn_late: 200             # $200 per late ASN (Walmart standard fine)
+  otif_floor: 0.95                      # Walmart large-supplier OTIF target (95%)
+
+q14:
+  # Which SKUs are slowing down before the buyer notices?
+  decay_threshold: -0.05                # < -5% velocity change (13 wk vs prior 13 wk) = in decay
+  caution_threshold: 0.05               # < +5% growth = caution — weakest momentum in portfolio
+
+q15:
+  # Why is cash tight when sales are up?
+  dso_warning: 45                       # > 45 days DSO = slow cash conversion
+  deduction_drag_warning: 0.12          # > 12% average deduction rate = material drag on cash

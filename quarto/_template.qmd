@@ -1,0 +1,58 @@
+---
+title: "Ask Cinderhaven — {{question}}"
+format:
+  pdf:
+    documentclass: article
+    geometry:
+      - top=0.8in
+      - bottom=0.8in
+      - left=0.8in
+      - right=0.8in
+    fontsize: 11pt
+    mainfont: "Source Sans 3"
+    include-in-header:
+      - text: |
+          \usepackage{xcolor}
+          \definecolor{navy}{HTML}{1f2e7a}
+          \definecolor{teal}{HTML}{158f75}
+          \definecolor{gridline}{HTML}{d9d9d9}
+          \definecolor{textsec}{HTML}{595959}
+params:
+  question: ""
+  verdict: ""
+  verdict_detail: ""
+  key_numbers: []
+  rule_explanation: ""
+  go_deeper_link: ""
+  go_deeper_label: ""
+  scenario: "baseline"
+  source_piece: ""
+---
+
+\textcolor{textsec}{\small\textit{`r params$scenario` scenario — figures reconcile to `r params$source_piece`}}
+
+\vspace{0.3in}
+
+## `r params$question`
+
+\vspace{0.1in}
+
+\textcolor{navy}{\textbf{`r params$verdict`}}
+
+\vspace{0.2in}
+
+---
+
+### How this verdict was reached
+
+`r params$rule_explanation`
+
+\vspace{0.2in}
+
+### Go deeper
+
+`r params$go_deeper_label`: `r params$go_deeper_link`
+
+\vspace{0.5in}
+
+\footnotesize\textcolor{textsec}{Built by Lailara LLC — data hygiene and analytics consulting for specialty food brands scaling into national retail. lailarallc.com}

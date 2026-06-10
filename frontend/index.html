@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ask Cinderhaven — Fifteen Questions Every Food Brand CEO Asks</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <span class="brand-name">Ask Cinderhaven</span>
+      <span class="brand-subtitle">Fifteen questions. Rules-based verdicts.</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hook">
+      <h1 class="hook-title">What's Actually Going On In Your Business?</h1>
+      <p class="hook-body">
+        Pick a question. The engine runs rules against a realistic food brand dataset
+        and returns an opinionated answer — one verdict, one chart, three numbers —
+        in under thirty seconds.
+      </p>
+    </section>
+
+    <section class="question-list" id="question-list">
+      <!-- Populated by main.js -->
+      <div class="loading">Loading questions…</div>
+    </section>
+
+    <section class="verdict-panel" id="verdict-panel" hidden>
+      <button class="back-btn" id="back-btn">&larr; All questions</button>
+
+      <div class="verdict-header">
+        <h2 class="verdict-question" id="verdict-question"></h2>
+        <span class="verdict-scenario" id="verdict-scenario"></span>
+      </div>
+
+      <div class="verdict-text" id="verdict-text"></div>
+
+      <div class="key-numbers" id="key-numbers"></div>
+
+      <div class="chart-wrap" id="chart-wrap">
+        <h3 class="chart-title" id="chart-title"></h3>
+        <svg id="verdict-chart"></svg>
+      </div>
+
+      <details class="rule-details">
+        <summary>How this verdict was reached</summary>
+        <p class="rule-explanation" id="rule-explanation"></p>
+      </details>
+
+      <div class="go-deeper">
+        <a class="go-deeper-link" id="go-deeper-link" href="#">Go deeper &rarr;</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Built by <a href="https://lailarallc.com">Lailara LLC</a> —
+      data hygiene and analytics consulting for specialty food brands scaling into national retail.
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="/src/api.js"></script>
+  <script src="/src/charts.js"></script>
+  <script src="/src/main.js"></script>
+</body>
+</html>
