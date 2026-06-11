@@ -1,5 +1,5 @@
 ---
-title: "Ask Cinderhaven — {{question}}"
+title: "Ask Cinderhaven — `r params$question`"
 format:
   pdf:
     documentclass: article
@@ -9,7 +9,6 @@ format:
       - left=0.8in
       - right=0.8in
     fontsize: 11pt
-    mainfont: "Source Sans 3"
     include-in-header:
       - text: |
           \usepackage{xcolor}
@@ -17,11 +16,13 @@ format:
           \definecolor{teal}{HTML}{158f75}
           \definecolor{gridline}{HTML}{d9d9d9}
           \definecolor{textsec}{HTML}{595959}
+execute:
+  echo: false
 params:
   question: ""
   verdict: ""
   verdict_detail: ""
-  key_numbers: []
+  key_numbers_json: "[]"
   rule_explanation: ""
   go_deeper_link: ""
   go_deeper_label: ""
@@ -29,7 +30,30 @@ params:
   source_piece: ""
 ---
 
-\textcolor{textsec}{\small\textit{`r params$scenario` scenario — figures reconcile to `r params$source_piece`}}
+```{r}
+#| include: false
+# Escape LaTeX special chars for content output into raw LaTeX blocks.
+tex_esc <- function(x) {
+  x <- gsub("\\\\", "\\\\textbackslash{}", x)
+  x <- gsub("$", "\\$", x, fixed = TRUE)
+  x <- gsub("%", "\\%", x, fixed = TRUE)
+  x <- gsub("&", "\\&", x, fixed = TRUE)
+  x <- gsub("#", "\\#", x, fixed = TRUE)
+  x <- gsub("{", "\\{", x, fixed = TRUE)
+  x <- gsub("}", "\\}", x, fixed = TRUE)
+  x
+}
+```
+
+```{r}
+#| results: asis
+# Output as {=latex} raw block so pandoc passes it verbatim — avoids $ / % misparse.
+cat(paste0("```{=latex}\n",
+           "\\textcolor{textsec}{\\small\\textit{",
+           tex_esc(params$scenario), " scenario --- figures reconcile to ",
+           tex_esc(params$source_piece), "}}\n",
+           "```\n"))
+```
 
 \vspace{0.3in}
 
@@ -37,7 +61,12 @@ params:
 
 \vspace{0.1in}
 
-\textcolor{navy}{\textbf{`r params$verdict`}}
+```{r}
+#| results: asis
+cat(paste0("```{=latex}\n",
+           "\\textcolor{navy}{\\textbf{", tex_esc(params$verdict), "}}\n",
+           "```\n"))
+```
 
 \vspace{0.2in}
 
@@ -55,4 +84,4 @@ params:
 
 \vspace{0.5in}
 
-\footnotesize\textcolor{textsec}{Built by Lailara LLC — data hygiene and analytics consulting for specialty food brands scaling into national retail. lailarallc.com}
+\footnotesize\textcolor{textsec}{Built by Lailara LLC --- data hygiene and analytics consulting for specialty food brands scaling into national retail. lailarallc.com}
