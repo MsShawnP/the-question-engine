@@ -2,6 +2,54 @@
 
 ---
 
+## 2026-06-11 — materialize_q12.py by-SKU query timed out due to extra fct_distribution join
+
+**What was tried:** `_SQL_BY_SKU` in materialize_q12.py used the same `errors` CTE as the summary (1.38M rows from fct_scan_data × fct_distribution), then added `JOIN public_marts.fct_distribution d ON d.sku = e.sku AND d.is_active = true` in the outer SELECT to get `avg_forecast_units`. Statement timed out at 10 minutes.
+
+**Why it failed:** The outer JOIN to `fct_distribution` (N rows per SKU across all stores) against the 1.38M-row `errors` CTE created a massive intermediate result before the GROUP BY could reduce it. The summary query (no outer join) completed; the by-SKU query did not.
+
+**Fix:** Pull `forecast_units` into the `errors` CTE itself (`f.forecast_units` already available from the join), use `AVG(e.forecast_units)` in the outer SELECT. No re-join to `fct_distribution` needed. Also set `statement_timeout = '0'` and `work_mem = '128MB'` to prevent disk spill.
+
+**Lesson:** Never JOIN back to a source table after aggregating (same lesson as Q11 stockout cost SQL). If a value is already in a CTE, use it — don't re-join to get it again.
+
+---
+
+## 2026-06-11 — Bash tool uses POSIX bash; Windows paths fail silently
+
+**What was tried:** Launched fly proxy via `Bash` tool using path `C:\Users\mssha\.fly\bin\fly.exe proxy ...`. Task failed with exit code 127 (command not found).
+
+**Why it failed:** The Bash tool runs `/usr/bin/bash` (POSIX shell on WSL or Git Bash), not PowerShell. Windows-style paths are invalid there.
+
+**Fix:** Use the PowerShell tool for any command that references a Windows path (fly.exe, Python via full path, etc.).
+
+**Lesson:** PowerShell tool for Windows paths and `.exe` invocations; Bash tool for POSIX-style commands only.
+
+---
+
+## 2026-06-11 — Python stdout buffering hid errors in background tasks
+
+**What was tried:** First materialize_q12.py run via PowerShell background task showed only the `DATABASE_URL` echo line — no Python output. Task reported failed with exit code 1 but no traceback visible.
+
+**Why it failed:** Python fully buffers stdout when not attached to a TTY (as in a background PowerShell job). All `print()` output is held until process exit — if the process crashes, the buffer is discarded.
+
+**Fix:** Add `-u` flag (`python -u script.py`) to force unbuffered stdout. Output then streams line-by-line to the output file.
+
+**Lesson:** Always use `python -u` when running Python scripts as background tasks. Alternatively, add `flush=True` to key print statements.
+
+---
+
+## 2026-06-11 — `Invoke-WebRequest` prompts for credentials in non-interactive PowerShell
+
+**What was tried:** Smoke-test loop using `Invoke-WebRequest -Uri ... -Method POST` in PowerShell NonInteractive mode. All non-503 responses showed "Read and Prompt functionality is not available."
+
+**Why it failed:** `Invoke-WebRequest` attempts credential prompts when it encounters certain HTTP responses; those prompts are unavailable in non-interactive mode.
+
+**Fix:** Use `curl` via the Bash tool for HTTP smoke tests.
+
+**Lesson:** Use `curl` (Bash tool) for HTTP smoke testing, not `Invoke-WebRequest`. If PowerShell is needed, `Invoke-RestMethod` is more resilient to interactive prompts.
+
+---
+
 ## 2026-06-10 — `COUNT(*) FROM fct_retailer_deductions` ≠ canonical "677 chargebacks"
 
 **What was tried:** check_canonical.py check assumed the canonical "677 retailer chargebacks" figure equalled `COUNT(*) FROM public_marts.fct_retailer_deductions`. Expected 677; actual 13,960.
