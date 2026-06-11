@@ -1,14 +1,14 @@
 # PLAN — The Question Engine
 
 **Tier:** Heavy (portfolio front door / capstone, maintained > 3 months)
-**Status:** Phase 3 complete — gate passes 7/7, ready to deploy
-**Priority:** Next #1 — ship to ask.lailarallc.com
+**Status:** Phase 5 shipped — live at ask.lailarallc.com, all 13 verdicts verified in production
+**Priority:** Phase 4 (Quarto one-pagers) or Phase 5 promotion tasks
 
 ---
 
 ## Current focus
 
-Gate passes 7/7. CINDERHAVEN_CANONICAL.md annotated with scope notes. Next: `fly deploy` to ask.lailarallc.com.
+Live at https://ask.lailarallc.com. 13/13 live verdicts return correct Cinderhaven data; q05/q06 return 503 (stubs awaiting source pieces). q12 runs ~40s (GROUP BY SKU over 1.4M rows) — acceptable for v1. Remaining Phase 5 tasks are non-engineering (homepage CTA, LinkedIn posts).
 
 ---
 
@@ -53,8 +53,9 @@ Gate passes 7/7. CINDERHAVEN_CANONICAL.md annotated with scope notes. Next: `fly
 - [ ] Consider gating bulk download
 
 ### Phase 5 — Deploy + promote
-- [ ] `fly deploy` to ask.lailarallc.com
-- [ ] Smoke-test all 15 verdicts on production
+- [x] `fly deploy` → https://ask-cinderhaven.fly.dev (2026-06-11)
+- [x] Smoke-test all 15 verdicts on production (13 pass, 2 stubs 503 as expected)
+- [x] Custom domain: ask.lailarallc.com live, cert issued (2026-06-11)
 - [ ] Homepage hero CTA takeover
 - [ ] /work page reorganizes around the engine
 - [ ] LinkedIn content calendar (15 posts, one per question)

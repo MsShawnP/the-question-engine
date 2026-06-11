@@ -1,8 +1,8 @@
 # HANDOFF — The Question Engine
 
-**Last updated:** 2026-06-10
-**Session:** Session 4 — canonical gate complete, ready to deploy
-**Phase:** Phase 3 done → ready for `fly deploy` (Phase 5)
+**Last updated:** 2026-06-11
+**Session:** Session 6 — q12 materialization fix, smoke tests pass, confirmed live at ask.lailarallc.com
+**Phase:** Phase 5 shipped — live at ask.lailarallc.com
 
 ---
 
@@ -61,11 +61,35 @@
 - Q11 uses `fct_distribution.weeks_with_sales` as a zero-velocity proxy. If fct_distribution is not refreshed regularly, stockout cost figures will lag reality.
 - `fct_retailer_deductions` has zero "open" deductions in baseline — all are expired or disputed. q10's `open_amount` is always 0; potential_recovery will always be 0 until data is refreshed with open deductions.
 
+## 2026-06-11 — Session 5
+
+**Did:**
+- Created `Dockerfile` (python:3.13-slim + uvicorn) and `.dockerignore`
+- Fixed pydantic version: 2.7.4 had no cp313 wheels; bumped to `>=2.9,<3`
+- Created Fly app `ask-cinderhaven`, set `DATABASE_URL` secret (cinderhaven-db.flycast internal network)
+- Changed `fly.toml` region from `ord` to `iad` (co-located with DB)
+- Resolved q12 OOM: `fct_scan_data` is 1.4M rows; `PERCENTILE_CONT` over 1.4M rows OOM-kills the DB machine; rewrote to GROUP BY sku first (50 groups, AVG only, no global sort), compute stats in Python from 50 rows
+- Added `idx_scan_sku_store` index on `fct_scan_data(sku, store_id)` for join performance
+- Deployed and smoke-tested: 13/13 live verdicts pass, q05/q06 return 503 stub as expected
+
+**State:** Live at https://ask.lailarallc.com. 13/13 verdicts verified on production. Custom domain cert issued. q12 runs ~40s (acceptable for v1).
+
+## 2026-06-11 — Session 6
+
+**Did:**
+- Committed Dockerfile, `.dockerignore`, `fly.toml` (region iad), relaxed pydantic version — all deploy prep from session 5
+- Fixed `materialize_q12.py`: by-SKU query was re-joining `fct_distribution` against 1.38M error rows (timeout). Fixed by pulling `forecast_units` from within the errors CTE. Also set `statement_timeout=0` and `work_mem=128MB`
+- Added `remat_q12_by_sku.py` for targeted by-SKU refresh without re-running summary
+- Ran `materialize_q12.py` to populate `q12_summary` / `q12_by_sku` (but deployed q12 module doesn't use these — it runs `_SQL_ALL_SKUS` GROUP BY SKU directly; pre-computed tables are unused)
+- Confirmed `ask.lailarallc.com` cert already issued; domain live
+- Smoke-tested all 15 verdicts on production: 13/13 pass, q05/q06 return 503
+
 ## What's next
 
-1. **Deploy** — `fly deploy`, then smoke-test `ask.lailarallc.com` (all 15 verdicts)
-2. **Homepage CTA** — update lailara-website hero to `ask.lailarallc.com`
-3. **Quarto one-pagers** — template at `quarto/_template.qmd`; render pipeline not built (Phase 4, can ship after deploy)
+1. **Homepage CTA** — update lailara-website hero to `ask.lailarallc.com`
+2. **/work page** — reorganize around the engine
+3. **LinkedIn content calendar** — 15 posts, one per question
+4. **Quarto one-pagers** — template at `quarto/_template.qmd`; render pipeline not built (Phase 4, can ship later)
 
 ---
 
