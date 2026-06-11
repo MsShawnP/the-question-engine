@@ -1,5 +1,5 @@
 app = "ask-cinderhaven"
-primary_region = "ord"
+primary_region = "iad"
 
 [build]
 

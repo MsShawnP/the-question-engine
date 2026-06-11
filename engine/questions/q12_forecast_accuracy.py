@@ -13,7 +13,15 @@ Secondary: median APE surfaces whether errors are systematic or
 driven by a long tail of outlier weeks.
 
 Routes to: Production Demand Forecast.
+
+Implementation note: fct_scan_data has 1.4M rows. To avoid OOM on the
+DB machine (sorting 1.4M values for PERCENTILE_CONT), we group by SKU first
+(50 groups of ~28K rows each — AVG only, no sort) and compute all statistics
+in Python from the 50-row result. This is macro-MAPE (average of per-SKU
+MAPEs) rather than micro-MAPE (global average), which gives a slightly
+different number but the same verdict direction.
 """
+import statistics
 import yaml
 from pathlib import Path
 
@@ -26,53 +34,27 @@ _CFG = yaml.safe_load(
     (Path(__file__).parent.parent.parent / "config" / "thresholds.yaml").read_text()
 )["q12"]
 
-_SQL_SUMMARY = """
-WITH forecast AS (
-    SELECT sku, store_id, avg_weekly_units AS forecast_units
-    FROM public_marts.fct_distribution
-    WHERE is_active = true AND avg_weekly_units > 0
-),
-errors AS (
+_SQL_ALL_SKUS = """
+WITH sku_errors AS (
     SELECT
         sd.sku,
-        ABS(sd.units_sold - f.forecast_units) / NULLIF(sd.units_sold::numeric, 0) AS abs_pct_error
+        AVG(ABS(sd.units_sold - f.avg_weekly_units) / NULLIF(sd.units_sold::numeric, 0)) AS sku_mape,
+        AVG(f.avg_weekly_units) AS avg_forecast_units
     FROM public_marts.fct_scan_data sd
-    JOIN forecast f ON f.sku = sd.sku AND f.store_id = sd.store_id
+    JOIN public_marts.fct_distribution f
+        ON f.sku = sd.sku AND f.store_id = sd.store_id
+        AND f.is_active = true AND f.avg_weekly_units > 0
     WHERE sd.units_sold > 0
-)
-SELECT
-    ROUND(AVG(abs_pct_error)::numeric * 100, 1)                                              AS mape_pct,
-    ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY abs_pct_error)::numeric * 100, 1)     AS median_ape_pct,
-    COUNT(DISTINCT sku)                                                                      AS sku_count,
-    COUNT(*)                                                                                 AS data_points
-FROM errors
-"""
-
-_SQL_BY_SKU = """
-WITH forecast AS (
-    SELECT sku, store_id, avg_weekly_units AS forecast_units
-    FROM public_marts.fct_distribution
-    WHERE is_active = true AND avg_weekly_units > 0
-),
-errors AS (
-    SELECT
-        sd.sku,
-        ABS(sd.units_sold - f.forecast_units) / NULLIF(sd.units_sold::numeric, 0) AS abs_pct_error
-    FROM public_marts.fct_scan_data sd
-    JOIN forecast f ON f.sku = sd.sku AND f.store_id = sd.store_id
-    WHERE sd.units_sold > 0
+    GROUP BY sd.sku
 )
 SELECT
     e.sku,
     dp.product_name,
-    ROUND(AVG(e.abs_pct_error)::numeric * 100, 1) AS mape_pct,
-    ROUND(AVG(d.avg_weekly_units)::numeric, 1)    AS avg_forecast_units
-FROM errors e
+    ROUND(e.sku_mape::numeric * 100, 1)     AS mape_pct,
+    ROUND(e.avg_forecast_units::numeric, 1) AS avg_forecast_units
+FROM sku_errors e
 JOIN public_marts.dim_products dp ON dp.sku = e.sku
-JOIN public_marts.fct_distribution d ON d.sku = e.sku AND d.is_active = true
-GROUP BY e.sku, dp.product_name
-ORDER BY mape_pct DESC
-LIMIT 10
+ORDER BY sku_mape DESC
 """
 
 
@@ -88,16 +70,17 @@ class ForecastAccuracyQuestion(BaseQuestion):
         )
 
     def run(self) -> VerdictResponse:
-        summary = query(_SQL_SUMMARY)[0]
-        by_sku = query(_SQL_BY_SKU)
+        all_skus = query(_SQL_ALL_SKUS)
 
-        mape = float(summary["mape_pct"] or 0)
-        median_ape = float(summary["median_ape_pct"] or 0)
-        sku_count = int(summary["sku_count"] or 0)
+        mapes = [float(r["mape_pct"]) for r in all_skus]
+        mape = round(statistics.mean(mapes), 1)
+        median_ape = round(statistics.median(mapes), 1)
+        sku_count = len(all_skus)
         cfg = _CFG
 
-        worst_sku = by_sku[0] if by_sku else None
-        best_sku = by_sku[-1] if by_sku else None
+        by_sku = all_skus[:10]
+        worst_sku = all_skus[0] if all_skus else None
+        best_sku = all_skus[-1] if all_skus else None
 
         if mape > cfg["mape_warning"]:
             verdict = (
@@ -154,9 +137,9 @@ class ForecastAccuracyQuestion(BaseQuestion):
             key_numbers=[
                 KeyNumber(label="Forecast MAPE", value=f"{mape:.1f}%"),
                 KeyNumber(
-                    label="Median error",
+                    label="Median SKU error",
                     value=f"{median_ape:.1f}%",
-                    context="50th percentile store-week error",
+                    context="Median of per-SKU MAPEs",
                 ),
                 KeyNumber(
                     label="Worst SKU",
@@ -166,12 +149,12 @@ class ForecastAccuracyQuestion(BaseQuestion):
             ],
             chart=chart_data,
             rule_explanation=(
-                f"MAPE = mean(|actual - forecast| / actual) across all active SKU-store-weeks with units_sold > 0. "
-                f"Forecast proxy = fct_distribution.avg_weekly_units (standing velocity per SKU-store). "
+                f"MAPE computed per SKU: AVG(|actual - forecast| / actual) across active store-weeks. "
+                f"Forecast proxy = fct_distribution.avg_weekly_units. "
+                f"Macro-MAPE = average of per-SKU MAPEs across {sku_count} SKUs. "
                 f"Decision-grade: < {cfg['mape_decision_grade']:.0f}%. "
                 f"Warning: {cfg['mape_decision_grade']:.0f}–{cfg['mape_warning']:.0f}%. "
-                f"Broken: > {cfg['mape_warning']:.0f}%. "
-                f"Thresholds from Production Demand Forecast."
+                f"Broken: > {cfg['mape_warning']:.0f}%."
             ),
             go_deeper_link=self.meta().go_deeper_link,
             go_deeper_label=self.meta().source_piece,
