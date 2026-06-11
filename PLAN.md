@@ -8,7 +8,7 @@
 
 ## Completion criteria
 
-Project is done when: Phase 4 one-pagers are complete (Parts 1–5 + SVGs + cross-links + Phase 3 polish) and exported as the final reader-facing artifact.
+Phase 4 complete when: every non-stub registered question (currently 13; Q05/Q06 stubs excluded) renders to a one-page PDF via the parameterized Quarto template; rendering is reproducible via a single script/make target; PDFs are delivered as pre-rendered static artifacts served by the app (a `GET /api/pdf/{question_id}` endpoint returning pre-built files from `static/pdfs/`).
 
 This project does not touch the lailara-website repo. Website surfacing and content marketing are handled through a separate process.
 
