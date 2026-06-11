@@ -39,6 +39,7 @@ WITH forecast AS (
 errors AS (
     SELECT
         sd.sku,
+        f.forecast_units,
         ABS(sd.units_sold - f.forecast_units) / NULLIF(sd.units_sold::numeric, 0) AS abs_pct_error
     FROM public_marts.fct_scan_data sd
     JOIN forecast f ON f.sku = sd.sku AND f.store_id = sd.store_id
@@ -48,10 +49,9 @@ SELECT
     e.sku,
     dp.product_name,
     ROUND(AVG(e.abs_pct_error)::numeric * 100, 1) AS mape_pct,
-    ROUND(AVG(d.avg_weekly_units)::numeric, 1) AS avg_forecast_units
+    ROUND(AVG(e.forecast_units)::numeric, 1) AS avg_forecast_units
 FROM errors e
 JOIN public_marts.dim_products dp ON dp.sku = e.sku
-JOIN public_marts.fct_distribution d ON d.sku = e.sku AND d.is_active = true
 GROUP BY e.sku, dp.product_name
 ORDER BY mape_pct DESC
 LIMIT 10
@@ -60,9 +60,8 @@ LIMIT 10
 print("Connecting to DB...")
 with engine.connect() as conn:
     conn = conn.execution_options(isolation_level="AUTOCOMMIT")
-    # Allow up to 10 minutes for the heavy query; increase work_mem to prevent disk spill
-    conn.execute(text("SET statement_timeout = '600000'"))
-    conn.execute(text("SET work_mem = '64MB'"))
+    conn.execute(text("SET statement_timeout = '0'"))
+    conn.execute(text("SET work_mem = '128MB'"))
 
     print("Running heavy q12 summary query (may take 60-120s)...")
     summary = conn.execute(text(_SQL_SUMMARY)).fetchone()
