@@ -1,14 +1,22 @@
 # PLAN — The Question Engine
 
 **Tier:** Heavy (portfolio front door / capstone, maintained > 3 months)
-**Status:** Phase 5 shipped — live at ask.lailarallc.com, all 13 verdicts verified in production
-**Priority:** Phase 4 (Quarto one-pagers) or Phase 5 promotion tasks
+**Status:** Phase 5 complete — live at ask.lailarallc.com, all 13 verdicts verified
+**Priority:** Phase 4 (Quarto one-pagers / final export artifact)
+
+---
+
+## Completion criteria
+
+Project is done when: Phase 4 one-pagers are complete (Parts 1–5 + SVGs + cross-links + Phase 3 polish) and exported as the final reader-facing artifact.
+
+This project does not touch the lailara-website repo. Website surfacing and content marketing are handled through a separate process.
 
 ---
 
 ## Current focus
 
-Live at https://ask.lailarallc.com. 13/13 live verdicts return correct Cinderhaven data; q05/q06 return 503 (stubs awaiting source pieces). q12 runs ~40s (GROUP BY SKU over 1.4M rows) — acceptable for v1. Remaining Phase 5 tasks are non-engineering (homepage CTA, LinkedIn posts).
+Phase 4 — Quarto one-pager render pipeline. Live app is stable: 13/13 verdicts pass at ask.lailarallc.com; q05/q06 stub 503 (awaiting source pieces); q12 ~40s acceptable for v1.
 
 ---
 
@@ -56,17 +64,16 @@ Live at https://ask.lailarallc.com. 13/13 live verdicts return correct Cinderhav
 - [x] `fly deploy` → https://ask-cinderhaven.fly.dev (2026-06-11)
 - [x] Smoke-test all 15 verdicts on production (13 pass, 2 stubs 503 as expected)
 - [x] Custom domain: ask.lailarallc.com — live (CNAME → fly app, cert Issued 2026-06-11)
-- [ ] Homepage hero CTA takeover
-- [ ] /work page reorganizes around the engine
-- [ ] LinkedIn content calendar (15 posts, one per question)
+- ~~Homepage hero CTA takeover~~ — REMOVED: handled outside this project
+- ~~_/work page reorganizes around the engine~~ — REMOVED: handled outside this project
+- ~~LinkedIn content calendar~~ — REMOVED: handled outside this project
 
 ---
 
 ## Open questions
 
 1. Final name: *Ask Cinderhaven* vs question-as-title
-2. Homepage: full hero replacement or co-primary CTA
-3. LLM natural-language question matching in v2? Lean pure select for v1.
+2. LLM natural-language question matching in v2? Lean pure select for v1.
 
 ---
 
