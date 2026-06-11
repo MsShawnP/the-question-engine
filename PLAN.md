@@ -55,7 +55,7 @@ Live at https://ask.lailarallc.com. 13/13 live verdicts return correct Cinderhav
 ### Phase 5 — Deploy + promote
 - [x] `fly deploy` → https://ask-cinderhaven.fly.dev (2026-06-11)
 - [x] Smoke-test all 15 verdicts on production (13 pass, 2 stubs 503 as expected)
-- [x] Custom domain: ask.lailarallc.com live, cert issued (2026-06-11)
+- [ ] Custom domain: ask.lailarallc.com — cert registered on Fly, DNS A+AAAA records not yet added (need Cloudflare token)
 - [ ] Homepage hero CTA takeover
 - [ ] /work page reorganizes around the engine
 - [ ] LinkedIn content calendar (15 posts, one per question)

@@ -84,12 +84,37 @@
 - Confirmed `ask.lailarallc.com` cert already issued; domain live
 - Smoke-tested all 15 verdicts on production: 13/13 pass, q05/q06 return 503
 
+## 2026-06-11 — Session 7
+
+**Started from:** Phase 5 in-progress — gate had passed 7/7 (Session 4) but deploy blocked by DB proxy not running locally.
+
+**Did:**
+- Ran `fly deploy` — all Docker layers cached (Depot), image 70 MB, deployed to `ask-cinderhaven` machine `48ee562a363508`; machine reached started state cleanly
+- Smoke-tested all 15 verdict endpoints via POST: q01–q04 + q07–q15 return HTTP 200; q05/q06 return HTTP 503 (stubs) — correct
+- Spot-checked q10 verdict body: real Cinderhaven data ($809K expired deductions, retailer breakdown by 6 accounts) — data pipeline confirmed end-to-end
+- Discovered `ask.lailarallc.com` cert status is **Not verified** — Fly shows no AAAA records in DNS. Previous HANDOFF entries claiming domain live were premature; DNS records were never actually added.
+- Identified DNS is on Cloudflare (nameservers: garret/linda.ns.cloudflare.com)
+- Attempted computer-use to navigate Cloudflare dashboard — timed out
+- No Cloudflare API token stored locally (no `~/.wrangler`, no `CF_API_TOKEN` env var)
+- User will paste Cloudflare API token next session; I'll call the API to add A + AAAA records
+
+**DNS records needed (Fly → Cloudflare):**
+- `A    ask.lailarallc.com → 66.241.124.8`
+- `AAAA ask.lailarallc.com → 2a09:8280:1::126:1158:0`
+
+**State:** App deployed and verified at `https://ask-cinderhaven.fly.dev`. Domain `ask.lailarallc.com` cert registered on Fly but DNS not pointed — domain not yet live on custom URL.
+
+**Next:** User pastes Cloudflare API token → add A + AAAA records via API → cert verifies (usually <5 min) → custom domain live → update PLAN.md Phase 5 custom domain task to ✅
+
+---
+
 ## What's next
 
-1. **Homepage CTA** — update lailara-website hero to `ask.lailarallc.com`
-2. **/work page** — reorganize around the engine
-3. **LinkedIn content calendar** — 15 posts, one per question
-4. **Quarto one-pagers** — template at `quarto/_template.qmd`; render pipeline not built (Phase 4, can ship later)
+1. **DNS** — paste Cloudflare token; I'll call the API to add A + AAAA records for ask.lailarallc.com
+2. **Homepage CTA** — update lailara-website hero to `ask.lailarallc.com`
+3. **/work page** — reorganize around the engine
+4. **LinkedIn content calendar** — 15 posts, one per question
+5. **Quarto one-pagers** — template at `quarto/_template.qmd`; render pipeline not built (Phase 4, can ship later)
 
 ---
 
