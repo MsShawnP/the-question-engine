@@ -2,6 +2,16 @@
 
 ---
 
+## 2026-06-12 — No bulk PDF download in v1; individual PDFs ungated
+
+**Decision:** v1 ships per-question PDFs only (`GET /api/pdf/{question_id}`). No zip-all/bulk endpoint. Individual PDFs are open — no email gate.
+
+**Why:** The PDFs exist to be shared one verdict at a time; a 13-file bundle serves scrapers more than readers. Email-gating is content-marketing machinery, and PLAN.md scopes all marketing surface to a separate process outside this repo. Not building the bulk endpoint *is* the gate.
+
+**How to apply:** If bulk export demand appears, revisit as a deliberate v2 item with the gating question decided in the website/marketing context — not added here casually. *(Logged autonomously 2026-06-12 — flag for review.)*
+
+---
+
 ## 2026-06-10 — Rules-based verdicts, not LLM
 
 **Decision:** Every verdict is produced by explicit Python rules with documented YAML thresholds. No LLM at the verdict layer.

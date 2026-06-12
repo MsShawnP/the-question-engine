@@ -1,8 +1,8 @@
 # PLAN — The Question Engine
 
 **Tier:** Heavy (portfolio front door / capstone, maintained > 3 months)
-**Status:** Phase 5 complete — live at ask.lailarallc.com, all 13 verdicts verified
-**Priority:** Phase 4 (Quarto one-pagers / final export artifact)
+**Status:** Phases 1–5 complete — live at ask.lailarallc.com, 13 verdicts + 13 one-pager PDFs
+**Priority:** Maintenance — no open work arc
 
 ---
 
@@ -16,7 +16,7 @@ This project does not touch the lailara-website repo. Website surfacing and cont
 
 ## Current focus
 
-Phase 4 — Quarto one-pager render pipeline. Live app is stable: 13/13 verdicts pass at ask.lailarallc.com; q05/q06 stub 503 (awaiting source pieces); q12 ~40s acceptable for v1.
+Maintenance. All phases complete: 13/13 verdicts pass at ask.lailarallc.com; q05/q06 stub 503 (awaiting the EDI reconciliation + recall source pieces); q12 ~40s acceptable for v1; one-pager PDFs served at /api/pdf/{id}. Re-run `make pdfs` + redeploy when canonical data or verdicts change.
 
 ---
 
@@ -55,10 +55,10 @@ Phase 4 — Quarto one-pager render pipeline. Live app is stable: 13/13 verdicts
 - [x] Run gate and fix any drift (7/7 pass; $1.66M scope documented)
 - [x] Verify: every figure shown reconciles to its source piece
 
-### Phase 4 — One-pagers + export
-- [ ] Quarto render pipeline per question (`quarto render quarto/_template.qmd`)
-- [ ] PDF download endpoint
-- [ ] Consider gating bulk download
+### Phase 4 — One-pagers + export ✅
+- [x] Quarto render pipeline per question ✓ — 2026-06-12 (`make pdfs` → scripts/render_pdfs.py; 13/13 non-stub questions render to static/pdfs/; key-numbers table + verdict detail added to template)
+- [x] PDF download endpoint ✓ — 2026-06-12 (`GET /api/pdf/{question_id}`; 404 unknown/unrendered, 503 stubs; 4 tests, suite 12/12)
+- [x] Bulk download gating — DECIDED 2026-06-12: no bulk endpoint in v1, individual PDFs ungated (see DECISIONS.md)
 
 ### Phase 5 — Deploy + promote
 - [x] `fly deploy` → https://ask-cinderhaven.fly.dev (2026-06-11)
