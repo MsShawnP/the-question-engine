@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import verdict
+from api.routers import pdf, verdict
 
 app = FastAPI(
     title="The Question Engine",
@@ -18,4 +18,5 @@ app.add_middleware(
 )
 
 app.include_router(verdict.router, prefix="/api")
+app.include_router(pdf.router, prefix="/api")
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
