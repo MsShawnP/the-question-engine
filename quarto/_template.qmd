@@ -22,7 +22,7 @@ params:
   question: ""
   verdict: ""
   verdict_detail: ""
-  key_numbers_json: "[]"
+  key_numbers_tex: ""
   rule_explanation: ""
   go_deeper_link: ""
   go_deeper_label: ""
@@ -68,9 +68,35 @@ cat(paste0("```{=latex}\n",
            "```\n"))
 ```
 
+```{r}
+#| results: asis
+if (nzchar(params$verdict_detail)) {
+  cat(paste0("```{=latex}\n",
+             "\\vspace{0.08in}\n",
+             "\\textcolor{textsec}{", tex_esc(params$verdict_detail), "}\n",
+             "```\n"))
+}
+```
+
 \vspace{0.2in}
 
 ---
+
+```{r}
+#| results: asis
+# key_numbers_tex arrives as finished, pre-escaped LaTeX tabular rows
+# (built in scripts/render_pdfs.py) — output verbatim, no escaping here.
+if (nzchar(params$key_numbers_tex)) {
+  cat(paste0("```{=latex}\n",
+             "\\subsubsection*{Key numbers}\n",
+             "\\vspace{0.05in}\n",
+             "\\begin{tabular}{@{}l p{4.0in}@{}}\n",
+             params$key_numbers_tex, "\n",
+             "\\end{tabular}\n",
+             "\\vspace{0.15in}\n",
+             "```\n"))
+}
+```
 
 ### How this verdict was reached
 

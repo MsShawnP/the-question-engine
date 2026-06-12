@@ -28,6 +28,8 @@ _quarto/
 /.quarto/
 *_files/
 *.pdf
+# Pre-rendered one-pagers are deploy artifacts — keep them tracked
+!static/pdfs/*.pdf
 
 # Node / frontend tooling (if added later)
 node_modules/

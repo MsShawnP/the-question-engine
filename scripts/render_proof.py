@@ -45,9 +45,9 @@ params = {
     "question": r.question,
     "verdict": r.verdict,
     "verdict_detail": r.verdict_detail,
-    # key_numbers excluded: Quarto reserves the `value:` key in param dicts;
-    # rendered separately in Gate 2 via a JSON string param.
-    "key_numbers_json": "[]",
+    # key_numbers excluded from the Gate 1 proof; the full pipeline
+    # (scripts/render_pdfs.py) passes them as pre-escaped LaTeX rows.
+    "key_numbers_tex": "",
     "rule_explanation": r.rule_explanation,
     "go_deeper_link": r.go_deeper_link or "",
     "go_deeper_label": r.go_deeper_label or "",
