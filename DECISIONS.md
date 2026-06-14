@@ -88,13 +88,13 @@
 
 ---
 
-## 2026-06-10 — Canonical $1.66M deduction figure is cross-channel; gate checks retailer-only
+## 2026-06-10 — Canonical $1.59M deduction figure is cross-channel; gate checks retailer-only
 
-**Decision:** The canonical "Deductions — total backlog $1.66M" covers all 9 trading partners (retailer + distributor). The Question Engine's q10 — and therefore `check_canonical.py` — validates only the retailer portion ($1.33M from `fct_retailer_deductions`). This is intentional scope separation, not drift.
+**Decision:** The canonical "Deductions — total backlog $1.59M" covers all 9 trading partners (retailer + distributor). The Question Engine's q10 — and therefore `check_canonical.py` — validates only the retailer portion from `fct_retailer_deductions`. This is intentional scope separation, not drift.
 
-**Why:** `fct_retailer_deductions` is a retailer-scoped mart by design. Distributor deductions live in a separate table. The $330K gap is documented and reconciled to the cent (retailer $1,332,704 + distributor $330,590 = canonical $1,663,294). Expanding q10 to include distributor data would require a separate question or a schema join not currently supported.
+**Why:** `fct_retailer_deductions` is a retailer-scoped mart by design. Distributor deductions live in a separate table. The gap between the cross-channel $1.59M and the retailer-only gate value is documented. Expanding q10 to include distributor data would require a separate question or a schema join not currently supported.
 
-**Do not:** change the gate's expected value to $1.66M. The gate correctly validates the retailer-only scope. If a cross-channel deduction question is added, it gets its own check with its own expected value and explicit scope annotation.
+**Do not:** change the gate's expected value to $1.59M. The gate correctly validates the retailer-only scope. If a cross-channel deduction question is added, it gets its own check with its own expected value and explicit scope annotation.
 
 ---
 

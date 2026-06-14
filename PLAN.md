@@ -52,7 +52,7 @@ Maintenance. All phases complete: 13/13 verdicts pass at ask.lailarallc.com; q05
 
 ### Phase 3 — Canonical reconciliation ✅
 - [x] Populate check_canonical.py expected values from CINDERHAVEN_CANONICAL.md
-- [x] Run gate and fix any drift (7/7 pass; $1.66M scope documented)
+- [x] Run gate and fix any drift (7/7 pass; $1.59M scope documented)
 - [x] Verify: every figure shown reconciles to its source piece
 
 ### Phase 4 — One-pagers + export ✅

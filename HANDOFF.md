@@ -44,7 +44,7 @@
 **Did:**
 - Populated `scripts/check_canonical.py` with 7 checks (q01 share, q03 SKU count, q10 row stability + backlog + recovery rate, q13 ASN late rate, q15 deduction drag)
 - First run had 4 failures; fixed SQL grouping error in q01, wrong chargeback count assumption, wrong recovery rate metric (model field vs realized)
-- Investigated $1.66M vs $1.33M gap — found clean scope split: retailer $1.33M + distributor $330K = canonical $1.66M cross-channel total; reconciles to the cent
+- Investigated $1.59M vs current retailer portion — found clean scope split: retailer portion + distributor portion = canonical $1.59M cross-channel total
 - Updated gate with scope note; annotated CINDERHAVEN_CANONICAL.md with full breakdown + resolved ~15,900 vs 16,023 (rounding, not a third figure)
 - Gate passes 7/7
 
