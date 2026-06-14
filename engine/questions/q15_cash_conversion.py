@@ -37,20 +37,42 @@ FROM public_marts.fct_retailer_payments
 """
 
 _SQL_BY_RETAILER = """
+-- Payments and DSO are computed in separate CTEs to avoid fanout.
+-- fct_retailer_payments has no FK to fct_retailer_orders; DSO is approximated
+-- via retailer_id + delivery_date within 90 days before payment received.
+-- One payment can match multiple orders, which may skew per-retailer DSO.
+-- No better join key exists in the schema.
+WITH payment_agg AS (
+    SELECT
+        p.retailer_id,
+        COUNT(p.remittance_id)                                                        AS payment_count,
+        ROUND(AVG(p.total_deductions / NULLIF(p.gross_amount, 0))::numeric * 100, 1) AS deduction_pct,
+        SUM(p.gross_amount)                                                           AS total_gross,
+        SUM(p.total_deductions)                                                       AS total_deductions
+    FROM public_marts.fct_retailer_payments p
+    GROUP BY p.retailer_id
+),
+dso_agg AS (
+    SELECT
+        p.retailer_id,
+        ROUND(AVG(p.received_date - fo.delivery_date)::numeric, 1) AS dso_days
+    FROM public_marts.fct_retailer_payments p
+    JOIN public_marts.fct_retailer_orders fo
+        ON fo.retailer_id = p.retailer_id
+        AND fo.delivery_date BETWEEN p.received_date - 90 AND p.received_date
+    GROUP BY p.retailer_id
+)
 SELECT
     dr.retailer_name,
-    COUNT(p.remittance_id)                                                      AS payment_count,
-    ROUND(AVG(p.total_deductions / NULLIF(p.gross_amount, 0))::numeric * 100, 1) AS deduction_pct,
-    ROUND(AVG(p.received_date - fo.delivery_date)::numeric, 1)                 AS dso_days,
-    SUM(p.gross_amount)                                                         AS total_gross,
-    SUM(p.total_deductions)                                                     AS total_deductions
-FROM public_marts.fct_retailer_payments p
-JOIN public_marts.dim_retailers dr ON p.retailer_id = dr.retailer_id
-JOIN public_marts.fct_retailer_orders fo
-    ON fo.retailer_id = p.retailer_id
-    AND fo.delivery_date BETWEEN p.received_date - 90 AND p.received_date
-GROUP BY dr.retailer_name
-ORDER BY deduction_pct DESC
+    pa.payment_count,
+    pa.deduction_pct,
+    da.dso_days,
+    pa.total_gross,
+    pa.total_deductions
+FROM payment_agg pa
+JOIN dso_agg da ON da.retailer_id = pa.retailer_id
+JOIN public_marts.dim_retailers dr ON dr.retailer_id = pa.retailer_id
+ORDER BY pa.deduction_pct DESC
 """
 
 
@@ -77,10 +99,13 @@ class CashConversionQuestion(BaseQuestion):
         avg_remittance = float(summary["avg_remittance"] or 0)
         cfg = _CFG
 
-        avg_dso = float(by_retailer[0]["dso_days"]) if by_retailer else 0
-        for r in by_retailer[1:]:
-            avg_dso += float(r["dso_days"])
-        avg_dso = avg_dso / len(by_retailer) if by_retailer else 0
+        gross_total_for_dso = sum(float(r["total_gross"]) for r in by_retailer)
+        avg_dso = (
+            sum(float(r["dso_days"]) * float(r["total_gross"]) for r in by_retailer)
+            / gross_total_for_dso
+            if gross_total_for_dso > 0
+            else 0
+        )
 
         worst_deduction_retailer = by_retailer[0] if by_retailer else None
         deduction_drag_fires = avg_deduction_rate / 100 > cfg["deduction_drag_warning"]
