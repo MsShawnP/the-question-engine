@@ -39,7 +39,7 @@ The user picks a question. The engine runs rules against the Cinderhaven canonic
 
 #### The Margin Math
 
-Inherited — each question surfaces the dollar figure its underlying piece established ($461K data defects, $977K trade waste, etc.). The engine is where all the portfolio's numbers appear on one surface for the first time. That synthesis is itself the demo: "imagine this running on your data."
+Inherited — each question surfaces the dollar figure its underlying piece established ($93K in data-attributable chargebacks, $460K in operational waste, etc.). The engine is where all the portfolio's numbers appear on one surface for the first time. That synthesis is itself the demo: "imagine this running on your data."
 
 #### Before / After
 
@@ -109,7 +109,7 @@ The rules are visible — deliberately. What can't be copied: the thresholds are
 
 ### 9. Cinderhaven Integration
 
-The capstone consumer. Reads every canonical mart; figures must match every shipped piece (the $461K, the $977K, channel rankings, SKU kill list). Run `make check-canonical` style validation as a release gate — an inconsistency here breaks the entire portfolio's coherence, not just this piece. Decision needed: trade-spend questions read baseline or distressed scenario (whichever the linked piece shows — likely distressed for the trade question, baseline elsewhere; document it).
+The capstone consumer. Reads every canonical mart; figures must match every shipped piece (the $93K, the $460K, channel rankings, SKU kill list). Run `make check-canonical` style validation as a release gate — an inconsistency here breaks the entire portfolio's coherence, not just this piece. Decision needed: trade-spend questions read baseline or distressed scenario (whichever the linked piece shows — likely distressed for the trade question, baseline elsewhere; document it).
 
 ### 10. Tactical Notes
 
