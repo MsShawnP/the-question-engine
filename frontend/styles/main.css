@@ -38,7 +38,7 @@ a:hover { color: var(--navy-hover); }
   padding: 20px 24px;
 }
 .header-inner {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   align-items: baseline;
@@ -60,7 +60,7 @@ a:hover { color: var(--navy-hover); }
 
 /* Main layout */
 main {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 48px 24px;
 }
@@ -78,7 +78,7 @@ main {
 .hook-body {
   font-size: 17px;
   color: var(--text-secondary);
-  max-width: 660px;
+  max-width: 720px;
   margin: 0;
 }
 
@@ -164,7 +164,7 @@ main {
   border-left: 3px solid var(--navy);
   padding-left: 20px;
   margin-bottom: 32px;
-  max-width: 660px;
+  max-width: 720px;
 }
 
 /* Key numbers */
