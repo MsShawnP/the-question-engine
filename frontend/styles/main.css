@@ -161,7 +161,7 @@ main {
 .verdict-text {
   font-size: 18px;
   color: var(--text-primary);
-  border-left: 3px solid var(--navy);
+  border-left: 4px solid var(--navy);
   padding-left: 20px;
   margin-bottom: 32px;
   max-width: 720px;
@@ -176,7 +176,7 @@ main {
 }
 .key-number {
   background: #fff;
-  border: 1px solid var(--gridline);
+  border-left: 4px solid var(--navy);
   border-radius: 2px;
   padding: 16px 20px;
   min-width: 160px;
