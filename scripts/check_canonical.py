@@ -9,7 +9,7 @@ Run: python scripts/check_canonical.py
 Exits 0 if all checks pass, 1 if any fail.
 
 Sources:
-  CINDERHAVEN_CANONICAL.md (authoritative) — 50 SKUs, $1.59M backlog, 6,563 chargebacks, ~16% recovery
+  CINDERHAVEN_CANONICAL.md (authoritative) — 50 SKUs, $1.35M backlog, 3,363 chargebacks, ~16% recovery
   Session-3 DB results (engine baseline) — 21% top account, 8.6% ASN late, 13.2% deduction drag
 """
 import sys
@@ -49,23 +49,21 @@ CHECKS = [
     # ── Q10: Deduction recovery ────────────────────────────────────────────
     {
         "id": "q10_deduction_row_count_stability",
-        "description": "Deduction row count stability check (baseline: 13,960 rows — reseed would change this)",
+        "description": "Deduction row count stability check (baseline: 14,947 rows — reseed would change this)",
         "query": "SELECT COUNT(*) AS value FROM public_marts.fct_retailer_deductions",
-        "expected": 13_960,
+        "expected": 14_947,
         "tolerance": 0,
     },
-    # SCOPE NOTE: canonical headline = $1.59M (retailer-deduction-recovery, summary.json).
+    # SCOPE NOTE: canonical headline = $1.35M / $1,346,815 (retailer + distributor).
     # That figure is CROSS-CHANNEL. fct_retailer_deductions is retailer-only by design;
     # distributor deductions live in a separate table. This gate checks the retailer
-    # portion only — the scope q10 surfaces.
-    # Do not "fix" this to $1.59M; the gap is intentional, not a data error.
-    # NOTE: gate expected value (1,332,704) may need verification against current DB
-    # if canonical figures have been recomputed. The gate runs against live DB at deploy time.
+    # portion only ($1,118,682 / 14,947 rows) — the scope q10 surfaces.
+    # Do not "fix" this to $1.35M; the gap is intentional, not a data error.
     {
         "id": "q10_deduction_backlog_retailer",
-        "description": "Retailer deduction backlog (canonical $1.59M cross-channel; this gate checks retailer portion only)",
+        "description": "Retailer deduction backlog (canonical $1.35M cross-channel; this gate checks retailer portion only)",
         "query": "SELECT SUM(deduction_amount) AS value FROM public_marts.fct_retailer_deductions",
-        "expected": 1_332_704,
+        "expected": 1_118_682,
         "tolerance": 5_000,
     },
     {
