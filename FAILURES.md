@@ -50,7 +50,9 @@
 
 ---
 
-## 2026-06-10 — `COUNT(*) FROM fct_retailer_deductions` ≠ canonical "677 chargebacks"
+## 2026-06-10 — `COUNT(*) FROM fct_retailer_deductions` ≠ canonical chargebacks count
+
+> Figure note (2026-06-30): canonical chargebacks is now **3,357** (2,873 retailer + 484 distributor) after the 06-20 causal retuning and the 06-28 slotting fix; the "677" below was the figure at the time. The lesson (chargebacks ≠ all deduction rows) is unchanged.
 
 **What was tried:** check_canonical.py check assumed the canonical "677 retailer chargebacks" figure equalled `COUNT(*) FROM public_marts.fct_retailer_deductions`. Expected 677; actual 13,960.
 

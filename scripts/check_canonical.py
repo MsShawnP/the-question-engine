@@ -9,7 +9,7 @@ Run: python scripts/check_canonical.py
 Exits 0 if all checks pass, 1 if any fail.
 
 Sources:
-  CINDERHAVEN_CANONICAL.md (authoritative) — 50 SKUs, $1.35M backlog, 3,363 chargebacks, ~15% recovery
+  CINDERHAVEN_CANONICAL.md (authoritative) — 50 SKUs, $1.35M backlog, 3,357 chargebacks, ~15% recovery
   Session-3 DB results (engine baseline) — 21% top account, 8.6% ASN late, 13.2% deduction drag
 """
 import sys

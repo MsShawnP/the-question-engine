@@ -44,8 +44,8 @@
 **Did:**
 - Populated `scripts/check_canonical.py` with 7 checks (q01 share, q03 SKU count, q10 row stability + backlog + recovery rate, q13 ASN late rate, q15 deduction drag)
 - First run had 4 failures; fixed SQL grouping error in q01, wrong chargeback count assumption, wrong recovery rate metric (model field vs realized)
-- Investigated $1.59M vs current retailer portion — found clean scope split: retailer portion + distributor portion = canonical $1.59M cross-channel total
-- Updated gate with scope note; annotated CINDERHAVEN_CANONICAL.md with full breakdown + resolved ~15,900 vs 16,023 (rounding, not a third figure)
+- Investigated cross-channel vs retailer portion — found clean scope split: retailer portion + distributor portion = canonical cross-channel total (was $1.59M / 16,023 rows at the time; **now $1.35M / 16,917 rows after the 06-20 deduction tuning**)
+- Updated gate with scope note; annotated CINDERHAVEN_CANONICAL.md with full breakdown
 - Gate passes 7/7
 
 **State:** Gate green. CINDERHAVEN_CANONICAL.md annotated. No deploy yet. PLAN.md Phase 3 marked complete.
