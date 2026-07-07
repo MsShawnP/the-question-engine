@@ -6,13 +6,11 @@ async function fetchQuestions() {
   return res.json();
 }
 
+const FRIENDLY_UNAVAILABLE =
+  "We couldn't compute this verdict right now — the data source may be unavailable.";
+
 async function fetchVerdict(questionId) {
   const res = await fetch(`${API_BASE}/verdict/${questionId}`, { method: "POST" });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || "Failed to load verdict");
-  }
-  return res.json();
-}
-
-window.QEApi = { fetchQuestions, fetchVerdict };
+    const body = await res.json().catch(() => ({}));
+    // Use the API's plain-language detail 

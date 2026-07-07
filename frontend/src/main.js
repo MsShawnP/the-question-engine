@@ -45,7 +45,15 @@ async function loadVerdict(questionId) {
     const verdict = await QEApi.fetchVerdict(questionId);
     renderVerdict(verdict);
   } catch (err) {
-    $("verdict-text").innerHTML = `<div class="error-banner">${err.message}</div>`;
+    // The API returns a plain-language `detail` for failures; fall back to a
+    // friendly message rather than surfacing raw error text.
+    const friendly = err.friendlyMessage || err.message ||
+      "We couldn't compute this verdict right now — the data source may be unavailable.";
+    const banner = document.createElement("div");
+    banner.className = "error-banner";
+    banner.textContent = friendly;
+    $("verdict-text").innerHTML = "";
+    $("verdict-text").appendChild(banner);
   }
 }
 
@@ -78,20 +86,4 @@ function showVerdictPanel() {
   $("question-list").parentElement.hidden = false;
   $("question-list").hidden = true;
   $("verdict-panel").hidden = false;
-  $("verdict-panel").removeAttribute("hidden");
-  window.scrollTo(0, 0);
-}
-
-function showQuestionList() {
-  $("question-list").hidden = false;
-  $("verdict-panel").hidden = true;
-}
-
-function showError(msg) {
-  const container = $("question-list");
-  container.innerHTML = `<div class="error-banner">${msg}</div>`;
-}
-
-$("back-btn").addEventListener("click", showQuestionList);
-
-document.addEventListener("DOMContentLoaded", init);
+  $("verdict-panel

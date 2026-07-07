@@ -46,7 +46,10 @@ ORDER BY total_amount DESC
 """
 
 _SQL_SHIPMENTS = """
-SELECT COUNT(*) AS total_shipments FROM public_marts.fct_retailer_shipments
+SELECT
+    COUNT(*)                                                                AS total_shipments,
+    GREATEST(CEIL((MAX(ship_date) - MIN(ship_date))::numeric / 7 + 1), 1)   AS data_weeks
+FROM public_marts.fct_retailer_shipments
 """
 
 
@@ -70,16 +73,19 @@ class WeightCostQuestion(BaseQuestion):
         weight_errors = int(weight_summary["weight_errors"])
         avg_case_cost = float(weight_summary["avg_case_cost"] or 0)
         total_shipments = int(shipment_row["total_shipments"])
+        data_weeks = float(shipment_row["data_weeks"] or 0)
 
         total_compliance = sum(float(r["total_amount"]) for r in compliance_rows)
-        avg_per_incident = (
-            sum(float(r["avg_per_incident"]) for r in compliance_rows) / len(compliance_rows)
-            if compliance_rows else 0
-        )
+        # Weight the per-incident average by incident counts (a plain mean of
+        # per-type averages over-weights rare deduction types).
+        total_incidents = sum(int(r["count"]) for r in compliance_rows)
+        avg_per_incident = total_compliance / total_incidents if total_incidents > 0 else 0
 
         error_rate = weight_errors / total_skus if total_skus > 0 else 0
-        # Project annual exposure: error rate × shipments × avg compliance cost per shipment
-        annual_shipments = total_shipments * _CFG["error_multiplier_annual"] / 52
+        # Project annual exposure: shipments per week over the data window,
+        # annualized (× 52), × error rate × avg compliance cost per incident.
+        weekly_shipments = total_shipments / data_weeks if data_weeks > 0 else 0
+        annual_shipments = weekly_shipments * _CFG["error_multiplier_annual"]
         projected_annual = error_rate * annual_shipments * avg_per_incident
 
         if total_compliance > 0:
@@ -136,15 +142,4 @@ class WeightCostQuestion(BaseQuestion):
             ],
             chart=chart_data,
             rule_explanation=(
-                "Compliance deductions = deduction_type containing 'compliance', 'weight', "
-                "'dimension', or 'label'. Projected exposure = error rate × annual shipments × "
-                "avg per-incident cost. Thresholds from Dimension & Weight Integrity piece."
-            ),
-            go_deeper_link=self.meta().go_deeper_link,
-            go_deeper_label=self.meta().source_piece,
-            scenario=self.meta().scenario,
-            source_piece=self.meta().source_piece,
-        )
-
-
-registry.register(WeightCostQuestion())
+                "Compliance deductions = deduction_type containing 'c

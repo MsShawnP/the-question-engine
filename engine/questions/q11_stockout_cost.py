@@ -16,7 +16,7 @@ Routes to: The 150 Cases You Didn't Ship.
 import yaml
 from pathlib import Path
 
-from engine.base import BaseQuestion
+from engine.base import BaseQuestion, NoDataError
 from engine.registry import registry
 from api.models.schemas import VerdictResponse, QuestionMeta, KeyNumber, ChartData
 from db.connection import query
@@ -92,8 +92,11 @@ class StockoutCostQuestion(BaseQuestion):
         )
 
     def run(self) -> VerdictResponse:
-        summary = query(_SQL_SUMMARY)[0]
+        summary_rows = query(_SQL_SUMMARY)
         by_sku = query(_SQL_BY_SKU)
+        if not summary_rows or not by_sku:
+            raise NoDataError("q11: no stockout data returned")
+        summary = summary_rows[0]
 
         total_lost = float(summary["total_implied_lost"] or 0)
         zero_weeks = int(summary["total_zero_weeks"] or 0)
@@ -168,10 +171,4 @@ class StockoutCostQuestion(BaseQuestion):
                 f"Routes to The 150 Cases You Didn't Ship."
             ),
             go_deeper_link=self.meta().go_deeper_link,
-            go_deeper_label=self.meta().source_piece,
-            scenario=self.meta().scenario,
-            source_piece=self.meta().source_piece,
-        )
-
-
-registry.register(StockoutCostQuestion())
+            go_deeper_label=self.meta().source

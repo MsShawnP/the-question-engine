@@ -88,9 +88,10 @@ class OtifExposureQuestion(BaseQuestion):
             verdict_detail = f"{asn_late_rate:.1%} ASN late — ${exposure:,.0f} exposure"
         else:
             verdict = (
-                f"OTIF compliance is clean: {asn_late_rate:.1%} ASN late rate, "
-                f"{on_time_rate:.1%} on-time delivery across {total_shipments:,} shipments. "
-                f"Both are above the {cfg['otif_floor']:.0%} Walmart floor. "
+                f"OTIF compliance is clean: {asn_late_rate:.1%} ASN late rate "
+                f"(below the {cfg['asn_late_rate_threshold']:.0%} threshold) and "
+                f"{on_time_rate:.1%} on-time delivery (above the {cfg['otif_floor']:.0%} Walmart floor) "
+                f"across {total_shipments:,} shipments. "
                 f"No material penalty exposure at current run rate."
             )
             verdict_detail = "OTIF compliant"
@@ -145,8 +146,4 @@ class OtifExposureQuestion(BaseQuestion):
             go_deeper_link=self.meta().go_deeper_link,
             go_deeper_label=self.meta().source_piece,
             scenario=self.meta().scenario,
-            source_piece=self.meta().source_piece,
-        )
-
-
-registry.register(OtifExposureQuestion())
+            source_piece=self.m

@@ -16,7 +16,7 @@ Routes to: contract-to-cash lifecycle analysis.
 import yaml
 from pathlib import Path
 
-from engine.base import BaseQuestion
+from engine.base import BaseQuestion, NoDataError
 from engine.registry import registry
 from api.models.schemas import VerdictResponse, QuestionMeta, KeyNumber, ChartData
 from db.connection import query
@@ -88,8 +88,11 @@ class CashConversionQuestion(BaseQuestion):
         )
 
     def run(self) -> VerdictResponse:
-        summary = query(_SQL_SUMMARY)[0]
+        summary_rows = query(_SQL_SUMMARY)
         by_retailer = query(_SQL_BY_RETAILER)
+        if not summary_rows or not by_retailer:
+            raise NoDataError("q15: no remittance data returned")
+        summary = summary_rows[0]
 
         total_gross = float(summary["total_gross"] or 0)
         total_net = float(summary["total_net"] or 0)
@@ -200,10 +203,4 @@ class CashConversionQuestion(BaseQuestion):
                 f"Thresholds from Contract-to-Cash Lifecycle."
             ),
             go_deeper_link=self.meta().go_deeper_link,
-            go_deeper_label=self.meta().source_piece,
-            scenario=self.meta().scenario,
-            source_piece=self.meta().source_piece,
-        )
-
-
-registry.register(CashConversionQuestion())
+            go_deeper_label=self.meta().s

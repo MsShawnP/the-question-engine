@@ -12,7 +12,7 @@ without per-retailer COGS allocation.
 import yaml
 from pathlib import Path
 
-from engine.base import BaseQuestion
+from engine.base import BaseQuestion, NoDataError
 from engine.registry import registry
 from api.models.schemas import VerdictResponse, QuestionMeta, KeyNumber, ChartData
 from db.connection import query
@@ -72,6 +72,8 @@ class BiggestCustomerQuestion(BaseQuestion):
 
     def run(self) -> VerdictResponse:
         rows = query(_SQL)
+        if not rows:
+            raise NoDataError("q01: no retailer revenue rows returned")
 
         top = rows[0]
         concentration = float(top["revenue_share"])
@@ -159,8 +161,4 @@ class BiggestCustomerQuestion(BaseQuestion):
             go_deeper_link=self.meta().go_deeper_link,
             go_deeper_label=self.meta().source_piece,
             scenario=self.meta().scenario,
-            source_piece=self.meta().source_piece,
-        )
-
-
-registry.register(BiggestCustomerQuestion())
+     

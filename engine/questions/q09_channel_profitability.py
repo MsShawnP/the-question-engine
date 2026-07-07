@@ -9,7 +9,7 @@ If all channels are positive, verdict ranks them by contribution_margin.
 
 No thresholds needed — any negative channel is an automatic verdict.
 """
-from engine.base import BaseQuestion
+from engine.base import BaseQuestion, NoDataError
 from engine.registry import registry
 from api.models.schemas import VerdictResponse, QuestionMeta, KeyNumber, ChartData
 from db.connection import query
@@ -45,6 +45,8 @@ class ChannelProfitabilityQuestion(BaseQuestion):
 
     def run(self) -> VerdictResponse:
         rows = query(_SQL)
+        if not rows:
+            raise NoDataError("q09: no channel contribution rows returned")
 
         best = rows[0]
         worst = rows[-1]
@@ -120,8 +122,4 @@ class ChannelProfitabilityQuestion(BaseQuestion):
             go_deeper_link=self.meta().go_deeper_link,
             go_deeper_label=self.meta().source_piece,
             scenario=self.meta().scenario,
-            source_piece=self.meta().source_piece,
-        )
-
-
-registry.register(ChannelProfitabilityQuestion())
+      

@@ -1,7 +1,16 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from api.models.schemas import VerdictResponse, QuestionMeta
+from engine.base import NoDataError
 from engine.registry import registry
+
+logger = logging.getLogger(__name__)
+
+_FRIENDLY_UNAVAILABLE = (
+    "We couldn't compute this verdict right now — the data source may be unavailable."
+)
 
 router = APIRouter()
 
@@ -23,7 +32,4 @@ def get_question(question_id: str):
 def run_verdict(question_id: str):
     q = registry.get(question_id)
     if not q:
-        raise HTTPException(status_code=404, detail=f"Question '{question_id}' not found")
-    if q.meta().is_stub:
-        raise HTTPException(status_code=503, detail="This question is not yet implemented")
-    return q.run()
+        raise HTTPE

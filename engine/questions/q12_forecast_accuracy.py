@@ -25,7 +25,7 @@ import statistics
 import yaml
 from pathlib import Path
 
-from engine.base import BaseQuestion
+from engine.base import BaseQuestion, NoDataError
 from engine.registry import registry
 from api.models.schemas import VerdictResponse, QuestionMeta, KeyNumber, ChartData
 from db.connection import query
@@ -71,6 +71,8 @@ class ForecastAccuracyQuestion(BaseQuestion):
 
     def run(self) -> VerdictResponse:
         all_skus = query(_SQL_ALL_SKUS)
+        if not all_skus:
+            raise NoDataError("q12: no forecast/actual rows returned")
 
         mapes = [float(r["mape_pct"]) for r in all_skus]
         mape = round(statistics.mean(mapes), 1)
@@ -91,6 +93,7 @@ class ForecastAccuracyQuestion(BaseQuestion):
                 f"Median error is {median_ape:.1f}% — the problem is systemic, not outlier-driven."
                 if median_ape > cfg["mape_warning"] * 0.7
                 else
+                f"Forecast MAPE is {mape:.1f}% — well above the {cfg['mape_warning']:.0f}% broken threshold. "
                 f"At this error rate, production and procurement decisions made from the forecast "
                 f"will be wrong by a third or more. "
                 f"Worst SKU: {worst_sku['product_name']} at {float(worst_sku['mape_pct']):.1f}% MAPE. "
@@ -156,11 +159,4 @@ class ForecastAccuracyQuestion(BaseQuestion):
                 f"Warning: {cfg['mape_decision_grade']:.0f}–{cfg['mape_warning']:.0f}%. "
                 f"Broken: > {cfg['mape_warning']:.0f}%."
             ),
-            go_deeper_link=self.meta().go_deeper_link,
-            go_deeper_label=self.meta().source_piece,
-            scenario=self.meta().scenario,
-            source_piece=self.meta().source_piece,
-        )
-
-
-registry.register(ForecastAccuracyQuestion())
+            go_deeper_link=self.meta().
