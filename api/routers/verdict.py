@@ -32,4 +32,14 @@ def get_question(question_id: str):
 def run_verdict(question_id: str):
     q = registry.get(question_id)
     if not q:
-        raise HTTPE
+        raise HTTPException(status_code=404, detail=f"Question '{question_id}' not found")
+    if q.meta().is_stub:
+        raise HTTPException(status_code=503, detail="This question is not yet implemented")
+    try:
+        return q.run()
+    except NoDataError as exc:
+        logger.warning("Verdict %s returned no data: %s", question_id, exc)
+        raise HTTPException(status_code=503, detail=_FRIENDLY_UNAVAILABLE)
+    except Exception:
+        logger.exception("Verdict %s failed", question_id)
+        raise HTTPException(status_code=503, detail=_FRIENDLY_UNAVAILABLE)

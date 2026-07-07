@@ -23,4 +23,8 @@ def _get_engine():
 
 
 def query(sql: str, params: dict | None = None) -> list[dict[str, Any]]:
-    """Execute a re
+    """Execute a read-only query and return rows as dicts."""
+    with _get_engine().connect() as conn:
+        result = conn.execute(text(sql), params or {})
+        cols = result.keys()
+        return [dict(zip(cols, row)) for row in result.fetchall()]

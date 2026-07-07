@@ -122,4 +122,8 @@ class ChannelProfitabilityQuestion(BaseQuestion):
             go_deeper_link=self.meta().go_deeper_link,
             go_deeper_label=self.meta().source_piece,
             scenario=self.meta().scenario,
-      
+            source_piece=self.meta().source_piece,
+        )
+
+
+registry.register(ChannelProfitabilityQuestion())

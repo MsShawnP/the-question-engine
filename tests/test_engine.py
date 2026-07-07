@@ -96,3 +96,59 @@ def test_q01_concentrated_but_acceptable():
         result = q.run()
 
     assert result.verdict_detail == "concentrated but acceptable deductions"
+
+
+def test_q08_annualization_and_weighted_incident_cost():
+    """
+    Projected annual exposure = error rate × (weekly shipment rate × 52) × avg
+    per-incident cost, where the per-incident average is weighted by incident
+    counts — not the historical shipment total or a plain mean of per-type averages.
+    """
+    from engine.questions.q08_weight_cost import WeightCostQuestion
+
+    def fake_query(sql, params=None):
+        if "dim_products" in sql:
+            return [{"total_skus": 100, "weight_errors": 10,
+                     "unit_weight_errors": 5, "avg_case_cost": 48.0}]
+        if "fct_retailer_deductions" in sql:
+            # Weighted avg = (9000 + 100) / (9 + 1) = $910; unweighted mean would be $550.
+            return [
+                {"deduction_type": "weight_compliance", "total_amount": 9000.0,
+                 "net_amount": 8500.0, "count": 9, "avg_per_incident": 1000.0},
+                {"deduction_type": "label_compliance", "total_amount": 100.0,
+                 "net_amount": 90.0, "count": 1, "avg_per_incident": 100.0},
+            ]
+        # 520 shipments over a 26-week window = 20/week → 1,040/year.
+        return [{"total_shipments": 520, "data_weeks": 26}]
+
+    q = WeightCostQuestion()
+    with patch("engine.questions.q08_weight_cost.query", side_effect=fake_query):
+        result = q.run()
+
+    # error_rate 0.10 × 1,040 annual shipments × $910 = $94,640
+    projected = next(k for k in result.key_numbers if k.label == "Projected annual exposure")
+    assert projected.value == "$94,640"
+    assert "$910 per incident" in result.verdict
+    # The old bug used all-history shipments (520) and an unweighted mean ($550):
+    # 0.10 × 520 × 550 = $28,600 — make sure that's not what we get.
+    assert projected.value != "$28,600"
+
+
+def test_q01_empty_rows_raises_no_data_error():
+    """Empty query results raise NoDataError instead of IndexError."""
+    from engine.base import NoDataError
+    from engine.questions.q01_biggest_customer import BiggestCustomerQuestion
+
+    q = BiggestCustomerQuestion()
+    with patch("engine.questions.q01_biggest_customer.query", return_value=[]):
+        with pytest.raises(NoDataError):
+            q.run()
+
+
+def test_verdict_endpoint_returns_friendly_503_on_failure(client):
+    """API turns engine failures into a plain-language 503, not a raw 500."""
+    with patch("engine.questions.q01_biggest_customer.query", return_value=[]):
+        resp = client.post("/api/verdict/q01")
+
+    assert resp.status_code == 503
+    assert "couldn't compute this verdict" in resp.json()["detail"]

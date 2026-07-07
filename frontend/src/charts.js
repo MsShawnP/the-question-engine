@@ -94,4 +94,55 @@ function renderBarChart(svgEl, chartData) {
     .call(ax => ax.select(".domain").attr("stroke", yMin < 0 ? "none" : COLORS.gridline))
     .call(ax => ax.selectAll("text")
       .attr("font-size", "12px")
-      .attr("fill", CO
+      .attr("fill", COLORS.textSec)
+      .attr("dy", "1.2em")
+      .call(wrap, x.bandwidth() + x.step() * x.paddingInner()));
+
+  // Zero baseline when the domain crosses zero
+  if (yMin < 0) {
+    g.append("line")
+      .attr("x1", 0).attr("x2", width)
+      .attr("y1", yZero).attr("y2", yZero)
+      .attr("stroke", COLORS.gridline);
+  }
+
+  // Y axis
+  g.append("g")
+    .call(d3.axisLeft(y).ticks(5).tickFormat(fmt))
+    .call(ax => ax.select(".domain").remove())
+    .call(ax => ax.selectAll("text").attr("font-size", "11px").attr("fill", COLORS.textSec));
+}
+
+// Wrap long axis labels
+function wrap(selection, maxWidth) {
+  selection.each(function () {
+    const text = d3.select(this);
+    const words = text.text().split(/\s+/).reverse();
+    let word, line = [], lineNumber = 0;
+    const lineHeight = 1.1;
+    const y = text.attr("y");
+    const dy = parseFloat(text.attr("dy")) || 0;
+    let tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", `${dy}em`);
+
+    while ((word = words.pop())) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > maxWidth) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan")
+          .attr("x", 0).attr("y", y)
+          .attr("dy", `${++lineNumber * lineHeight + dy}em`)
+          .text(word);
+      }
+    }
+  });
+}
+
+function renderChart(svgEl, chartData) {
+  if (!chartData || !chartData.data?.length) return;
+  if (chartData.type === "bar") renderBarChart(svgEl, chartData);
+}
+
+window.QECharts = { renderChart };

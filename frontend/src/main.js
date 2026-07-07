@@ -86,4 +86,20 @@ function showVerdictPanel() {
   $("question-list").parentElement.hidden = false;
   $("question-list").hidden = true;
   $("verdict-panel").hidden = false;
-  $("verdict-panel
+  $("verdict-panel").removeAttribute("hidden");
+  window.scrollTo(0, 0);
+}
+
+function showQuestionList() {
+  $("question-list").hidden = false;
+  $("verdict-panel").hidden = true;
+}
+
+function showError(msg) {
+  const container = $("question-list");
+  container.innerHTML = `<div class="error-banner">${msg}</div>`;
+}
+
+$("back-btn").addEventListener("click", showQuestionList);
+
+document.addEventListener("DOMContentLoaded", init);

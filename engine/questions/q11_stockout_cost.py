@@ -171,4 +171,10 @@ class StockoutCostQuestion(BaseQuestion):
                 f"Routes to The 150 Cases You Didn't Ship."
             ),
             go_deeper_link=self.meta().go_deeper_link,
-            go_deeper_label=self.meta().source
+            go_deeper_label=self.meta().source_piece,
+            scenario=self.meta().scenario,
+            source_piece=self.meta().source_piece,
+        )
+
+
+registry.register(StockoutCostQuestion())

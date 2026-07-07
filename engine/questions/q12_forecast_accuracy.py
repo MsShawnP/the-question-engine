@@ -159,4 +159,11 @@ class ForecastAccuracyQuestion(BaseQuestion):
                 f"Warning: {cfg['mape_decision_grade']:.0f}–{cfg['mape_warning']:.0f}%. "
                 f"Broken: > {cfg['mape_warning']:.0f}%."
             ),
-            go_deeper_link=self.meta().
+            go_deeper_link=self.meta().go_deeper_link,
+            go_deeper_label=self.meta().source_piece,
+            scenario=self.meta().scenario,
+            source_piece=self.meta().source_piece,
+        )
+
+
+registry.register(ForecastAccuracyQuestion())

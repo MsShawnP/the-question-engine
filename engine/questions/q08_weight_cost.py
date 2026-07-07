@@ -142,4 +142,17 @@ class WeightCostQuestion(BaseQuestion):
             ],
             chart=chart_data,
             rule_explanation=(
-                "Compliance deductions = deduction_type containing 'c
+                "Compliance deductions = deduction_type containing 'compliance', 'weight', "
+                "'dimension', or 'label'. Avg per-incident cost = total compliance dollars ÷ "
+                "incident count. Projected exposure = error rate × annualized shipments "
+                "(weekly shipment rate over the data window × 52) × avg per-incident cost. "
+                "Thresholds from Dimension & Weight Integrity piece."
+            ),
+            go_deeper_link=self.meta().go_deeper_link,
+            go_deeper_label=self.meta().source_piece,
+            scenario=self.meta().scenario,
+            source_piece=self.meta().source_piece,
+        )
+
+
+registry.register(WeightCostQuestion())

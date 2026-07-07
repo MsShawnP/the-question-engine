@@ -13,4 +13,13 @@ async function fetchVerdict(questionId) {
   const res = await fetch(`${API_BASE}/verdict/${questionId}`, { method: "POST" });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    // Use the API's plain-language detail 
+    // Use the API's plain-language detail when present; never surface raw
+    // status text or stack traces to the user.
+    const error = new Error(body.detail || FRIENDLY_UNAVAILABLE);
+    error.friendlyMessage = body.detail || FRIENDLY_UNAVAILABLE;
+    throw error;
+  }
+  return res.json();
+}
+
+window.QEApi = { fetchQuestions, fetchVerdict };
