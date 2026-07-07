@@ -1,16 +1,14 @@
 # The Question Engine
 
+Fifteen questions every specialty food brand CEO asks, each answered in 30 seconds with a rules-based verdict, one chart, and the three numbers behind it.
+
 **Live:** https://ask.lailarallc.com
 
-Fifteen questions every specialty food brand CEO asks, answered with rules-based verdicts on the Cinderhaven canonical dataset. The CEO picks a question; the engine runs documented rules against the Cinderhaven mart layer and returns a verdict (one sentence, opinionated), the one chart that justifies it, the three numbers behind it, and a link into the deep-dive portfolio piece. Fifteen questions, each a 30-second experience, each a doorway.
-
-Deliberately not an LLM. Every verdict is produced by explicit, readable rules with documented thresholds — transparency is the product.
-
-## Cinderhaven context
-
-Built on the Cinderhaven synthetic dataset — a ~$25M specialty food brand, 50 SKUs across 5 product lines and 6 contracted retailers. Data is synthetic; methodology and deliverables are real.
-
 ## What it does
+
+The CEO picks a question; the engine runs documented rules against the Cinderhaven mart layer and returns a verdict (one sentence, opinionated), the one chart that justifies it, the three numbers behind it, and a link into the deep-dive portfolio piece. Fifteen questions, each a doorway.
+
+Deliberately not an LLM. Every verdict is produced by explicit, readable rules with documented thresholds (`config/thresholds.yaml`) — transparency is the product.
 
 | # | Question | Source piece |
 |---|---|---|
@@ -32,25 +30,15 @@ Built on the Cinderhaven synthetic dataset — a ~$25M specialty food brand, 50 
 
 13 verdicts live; Q05 and Q06 return 503 pending their source pieces (EDI Reconciliation v2, Recall Blast Radius).
 
-## Stack
+## Why it matters
 
-- Python 3.13 — FastAPI + Uvicorn
-- Rules engine: one module per question, YAML thresholds (`config/thresholds.yaml`)
-- Frontend: vanilla JS + D3 (no build step)
-- One-pagers: Quarto templates rendered to PDF (`make pdfs`)
-- Data: Postgres / dbt — reads existing Cinderhaven marts, no new models
-- Deploy: Fly.io (API) + Cloudflare (DNS)
-- Dev: pytest, pytest-asyncio, httpx, ruff
+Executives don't want dashboards; they want answers to the questions they already have. Each verdict compresses a full analytical deliverable into a 30-second experience, and each links to the deep-dive piece behind it — a low-friction front door to the entire portfolio. Because every threshold is documented and every rule is readable code, the reasoning behind each verdict can be audited line by line.
 
-## Data contract
+Built on the Cinderhaven synthetic dataset — a ~$25M specialty food brand, 50 SKUs across 5 product lines and 6 contracted retailers. Data is synthetic; methodology and deliverables are real.
 
-**Canonical baseline:** 50 SKUs · 5 product lines (AS·PS·SC·DG·SB) · 6 retailers (Walmart·Costco·Whole Foods·Sprouts·Kroger·Regional Group) · 10 channels (6 retail + UNFI·KeHE·DPI + DTC)
+## Quick start
 
-Every figure shown reconciles to its source piece via `scripts/check_canonical.py`. An inconsistency breaks the entire portfolio's coherence — it is the one unforgivable bug.
-
-## Run
-
-```
+```bash
 git clone https://github.com/MsShawnP/the-question-engine.git
 cd the-question-engine
 cp .env.example .env
@@ -60,17 +48,49 @@ make dev
 # → http://localhost:8000
 ```
 
-Release gate (run before every deploy):
+Other targets (see `Makefile`):
+
+```bash
+make test             # pytest suite
+make check-canonical  # every displayed figure must reconcile to its source piece
+make preflight        # release gate: check-canonical + test — run before every deploy
+make pdfs             # render one-pagers to static/pdfs/ (needs DATABASE_URL + Quarto)
+make lint             # ruff
+```
+
+Deploy: `fly deploy` (container defined in `Dockerfile`, config in `fly.toml`).
+
+## Tech stack
+
+- **Python 3.13** — FastAPI + Uvicorn
+- **Rules engine** — one module per question (`engine/questions/q01…q15`), YAML thresholds (`config/thresholds.yaml`)
+- **Frontend** — vanilla JS + D3, no build step (`frontend/`)
+- **One-pagers** — Quarto templates rendered to PDF (`quarto/`, `make pdfs`)
+- **Data** — Postgres / dbt: reads existing Cinderhaven marts, no new models
+- **Deploy** — Fly.io (API) + Cloudflare (DNS)
+- **Dev** — pytest, pytest-asyncio, httpx, ruff
+
+## Project structure
 
 ```
-make preflight
+api/       FastAPI app, routers (verdict, pdf), response schemas
+engine/    Verdict rules: base.py, registry.py, questions/q01–q15
+config/    questions.yaml (catalog), thresholds.yaml (documented cut-offs)
+frontend/  Static UI (index.html, src/, styles/)
+quarto/    One-pager templates
+scripts/   check_canonical.py (reconciliation gate), render_pdfs.py, utilities
+tests/     pytest suite
 ```
 
-Deploy:
+## Data contract
 
-```
-fly deploy
-```
+**Canonical baseline:** 50 SKUs · 5 product lines (AS·PS·SC·DG·SB) · 6 retailers (Walmart·Costco·Whole Foods·Sprouts·Kroger·Regional Group) · 10 channels (6 retail + UNFI·KeHE·DPI + DTC)
+
+Every figure shown reconciles to its source piece via `scripts/check_canonical.py`. An inconsistency breaks the entire portfolio's coherence — it is the one unforgivable bug.
+
+## License
+
+MIT
 
 ---
 
