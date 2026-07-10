@@ -34,7 +34,15 @@ SELECT
     COUNT(CASE WHEN case_weight_lbs IS NULL OR case_weight_lbs <= 0 THEN 1 END)   AS weight_errors,
     COUNT(CASE WHEN case_length_in  IS NULL OR case_length_in  <= 0
                OR case_width_in    IS NULL OR case_width_in    <= 0
-               OR case_height_in   IS NULL OR case_height_in   <= 0 THEN 1 END)  AS dimension_errors
+               OR case_height_in   IS NULL OR case_height_in   <= 0 THEN 1 END)  AS dimension_errors,
+    COUNT(DISTINCT CASE WHEN
+               (gtin14 IS NULL OR gtin14 = '' OR LENGTH(TRIM(gtin14)) != 14 OR gtin14 !~ '^[0-9]{14}$')
+            OR (upc IS NULL OR upc = '' OR LENGTH(TRIM(upc)) NOT IN (12, 13) OR upc !~ '^[0-9]{12,13}$')
+            OR (case_weight_lbs IS NULL OR case_weight_lbs <= 0)
+            OR (case_length_in IS NULL OR case_length_in <= 0
+                OR case_width_in IS NULL OR case_width_in <= 0
+                OR case_height_in IS NULL OR case_height_in <= 0)
+        THEN sku END)                                                             AS skus_with_errors
 FROM public_marts.dim_products
 """
 
@@ -79,7 +87,7 @@ class ProductDataPreflightQuestion(BaseQuestion):
 
     def run(self) -> VerdictResponse:
         summary = query(_SQL)[0]
-        bad_skus = query(_SQL_BAD_SKUS)
+        bad_skus = query(_SQL_BAD_SKUS)  # LIMIT 20 — powers the example list only
 
         total = int(summary["total_skus"])
         gtin_err = int(summary["gtin_errors"])
@@ -87,7 +95,11 @@ class ProductDataPreflightQuestion(BaseQuestion):
         weight_err = int(summary["weight_errors"])
         dim_err = int(summary["dimension_errors"])
 
-        skus_with_any_error = len(bad_skus)
+        # Count DISTINCT failing SKUs across the whole catalog. Previously this
+        # used len(bad_skus), which is capped by the LIMIT 20 example query and
+        # silently under-reports the failure count once >20 SKUs are affected.
+        skus_with_any_error = int(summary["skus_with_errors"])
+        example_skus = [r["sku"] for r in bad_skus[:5]]
         critical_rate = skus_with_any_error / total if total > 0 else 0
         cfg = _CFG
         worst_field = max(
@@ -146,11 +158,13 @@ class ProductDataPreflightQuestion(BaseQuestion):
             ],
             chart=chart_data,
             rule_explanation=(
-                f"Critical fields: GTIN-14 (14-digit numeric), UPC (12-13 digit numeric), "
+                f"Failure count = COUNT(DISTINCT sku) with any critical-field error across all "
+                f"{total} SKUs. Critical fields: GTIN-14 (14-digit numeric), UPC (12-13 digit numeric), "
                 f"case weight (> 0), case dimensions (all three > 0). "
                 f"Do-not-submit threshold: > {cfg['critical_error_threshold']:.0%} SKU error rate. "
                 f"Warning: > {cfg['warning_error_threshold']:.0%}. "
-                f"Thresholds from Product Data Health Audit."
+                + (f"Example affected SKUs: {', '.join(example_skus)}. " if example_skus else "")
+                + f"Thresholds from Product Data Health Audit."
             ),
             go_deeper_link=self.meta().go_deeper_link,
             go_deeper_label=self.meta().source_piece,
