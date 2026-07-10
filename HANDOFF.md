@@ -1,8 +1,33 @@
 # HANDOFF — The Question Engine
 
-**Last updated:** 2026-06-11
-**Session:** Session 6 — q12 materialization fix, smoke tests pass, confirmed live at ask.lailarallc.com
-**Phase:** Phase 5 shipped — live at ask.lailarallc.com
+**Last updated:** 2026-07-10
+**Session:** Session 7 — restored ask.lailarallc.com outage + reconstructed audit-fixes
+**Phase:** Phase 5 maintenance — live at ask.lailarallc.com, verdicts + audit-fixes deployed
+
+---
+
+## 2026-07-10 — Session 7 (outage restore + audit-fixes)
+
+**Outage:** every verdict returned "data source may be unavailable" (503). Root cause was two stacked DB-connection breakages — NOT a missing artifact, and DATABASE_URL *was* set:
+1. `DATABASE_URL` used the legacy `postgres://` scheme (from `fly pg attach`); SQLAlchemy 2.x rejects it (`Can't load plugin: sqlalchemy.dialects:postgres`), so `create_engine()` threw before any query → the `except → 503` path fired for all verdicts.
+2. cinderhaven-db credentials had desynced (its own `flypgadmin` monitor was failing md5 auth; the `postgres` role password no longer matched the app secret).
+
+**Fixes (all deployed + pushed to main):**
+- `db/connection.py` normalizes `postgres://`→`postgresql://` (durable guard against re-attach).
+- Resynced cinderhaven-db `postgres`/`flypgadmin`/`repmgr` role passwords to their secret env values via the local **trust** socket (`psql -h /var/run/postgresql -p 5433 -U postgres`; real PG is on 5433). Repointed `ask-cinderhaven` `DATABASE_URL` to `SU_PASSWORD` (URL-encoded) via `fly secrets set`.
+- See memory `question-engine-outage-postgres-scheme.md` for the full recovery playbook.
+
+**Audit-fixes** — there was NO audit-fixes branch anywhere (confirmed: no local/remote branch, no dangling commits); reconstructed all 6 from spec and validated the verdict-changing ones against CINDERHAVEN_CANONICAL.md:
+- Frontend: demoted brand/"Fifteen questions" hero → plain value prop; count now set dynamically to the 13 non-stub questions that render (`main.js` #question-count); `#fde8e7`→`#fce8e7`; self-hosted Playfair Display + Source Sans 3 (woff2 under `/fonts/`, `@font-face`, no CDN).
+- q07: failing-SKU count now `COUNT(DISTINCT sku)` (was `len(bad_skus)` capped by LIMIT 20). Before 20/50 (40%) → after **21/50 (42%)**, dimensions worst (19). LIMIT 20 kept for the example-SKU list.
+- q02: relabeled promo "payback/ROI" → **revenue-coverage months** (a liquidity proxy, not profit). Verdict now cites the canonical Cost of Saying Yes launch model (net cash Year 1 **−$36,320** on **$499,200** gross). Chose the relabel (reconcilable) over a contribution-margin ROI, which couldn't reconcile to the single modeled-launch figure.
+- Follow-ups: self-hosted D3 (`/vendor/d3.min.js` v7.9.0, dropped jsdelivr CDN); registered `font/woff2` MIME in `api/main.py`.
+
+**Verified in browser:** hero demoted, "Pick one of 13 questions", Playfair renders; q01 + q02 verdicts render (verdict + 3 numbers + chart) with vendored D3; fonts serve `font/woff2`.
+
+**Commits:** `a512eb9` (scheme) → `1937231` (d3+mime), pushed to origin/main. Tests 15/15.
+
+**Note:** live verdict figures differ from the Session-6 table below (data retuned post-06-20); e.g. q09 now "all channels positive", q15 12.7% drag. That's current-data drift, not a regression.
 
 ---
 
