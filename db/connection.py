@@ -18,6 +18,11 @@ def _get_engine():
                 "DATABASE_URL is not set. Add it to your environment or .env file, "
                 "e.g. DATABASE_URL=postgresql://user:pass@localhost:5432/dbname"
             )
+        # `fly pg attach` (and Heroku-style configs) emit the legacy "postgres://"
+        # scheme, which SQLAlchemy 2.x refuses to load ("Can't load plugin:
+        # sqlalchemy.dialects:postgres"). Normalize to the canonical dialect.
+        if url.startswith("postgres://"):
+            url = "postgresql://" + url[len("postgres://"):]
         _engine = create_engine(url)
     return _engine
 
