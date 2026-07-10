@@ -1,11 +1,15 @@
 """
 Q02: Can I afford this retailer launch?
 
-Uses actual launch data from the Cinderhaven dataset. For each retailer, computes
-total promotional investment vs. cumulative revenue to derive a payback period.
-Verdict fires when the costliest launch has a payback > BREAKEVEN_MONTHS_THRESHOLD.
+For each retailer, computes how quickly top-line revenue covers the promotional
+investment ("revenue-coverage months" = promo ÷ average monthly revenue). This is a
+LIQUIDITY signal, not a profitability one — revenue is not margin. The verdict makes
+that distinction explicit and anchors affordability to the modeled launch economics
+in the "Cost of Saying Yes" piece, where a launch of this size runs net-cash-negative
+in year one once COGS, trade spend, and working capital are counted.
 
-Thresholds calibrated from Cost of Saying Yes piece.
+Figures reconcile to CINDERHAVEN_CANONICAL.md (Launch economics: gross Year 1
+$499,200 / net cash Year 1 −$36,320).
 """
 import yaml
 from pathlib import Path
@@ -18,6 +22,12 @@ from db.connection import query
 _CFG = yaml.safe_load(
     (Path(__file__).parent.parent.parent / "config" / "thresholds.yaml").read_text()
 )["q02"]
+
+# Modeled launch economics from the "Cost of Saying Yes" piece (CINDERHAVEN_CANONICAL.md).
+# These are the source-piece reality check: revenue coverage looks fast, but a launch of
+# this size is net-cash-negative in year one.
+_MODELED_GROSS_YEAR1 = 499_200
+_MODELED_NET_CASH_YEAR1 = -36_320
 
 _SQL_REVENUE = """
 SELECT
@@ -68,53 +78,62 @@ class RetailerLaunchCostQuestion(BaseQuestion):
             total_rev = float(rev["total_revenue"] or 0)
             months = float(rev["relationship_months"] or 1)
             monthly_rev = total_rev / max(months, 1)
-            payback_months = total_promo / monthly_rev if monthly_rev > 0 else 999
+            # Revenue-coverage months: how long top-line revenue takes to cover the
+            # promo outlay. A liquidity proxy — NOT a payback/ROI on profit.
+            coverage_months = total_promo / monthly_rev if monthly_rev > 0 else 999
 
             combined.append({
                 "retailer_name": name,
                 "total_revenue": total_rev,
                 "total_promo": total_promo,
                 "relationship_months": months,
-                "payback_months": payback_months,
-                "roi_multiple": total_rev / total_promo if total_promo > 0 else 0,
+                "coverage_months": coverage_months,
+                "revenue_to_promo": total_rev / total_promo if total_promo > 0 else 0,
             })
 
-        combined.sort(key=lambda x: x["payback_months"], reverse=True)
-        worst = combined[0]
+        combined.sort(key=lambda x: x["coverage_months"], reverse=True)
+        worst = combined[0]  # slowest revenue coverage
         cfg = _CFG
+        total_promo_all = sum(r["total_promo"] for r in combined)
+        modeled = (
+            f"the Cost of Saying Yes model shows a launch of this size runs net-cash-negative in "
+            f"year one — about ${_MODELED_NET_CASH_YEAR1:,.0f} on ${_MODELED_GROSS_YEAR1:,.0f} of "
+            f"gross revenue — once COGS, trade spend, and working capital are counted"
+        )
 
-        if worst["payback_months"] > cfg["breakeven_months_threshold"]:
+        if worst["coverage_months"] > cfg["breakeven_months_threshold"]:
             verdict = (
-                f"Your most expensive launch — {worst['retailer_name']} — required "
-                f"{_fmt_months(worst['payback_months'])} to break even on promo investment. "
-                f"That exceeds the {cfg['breakeven_months_threshold']}-month ceiling. "
-                f"Before the next launch, model working capital through month {cfg['working_capital_buffer_months'] + int(worst['payback_months'])}."
+                f"Your slowest launch — {worst['retailer_name']} — needs "
+                f"{_fmt_months(worst['coverage_months'])} of revenue just to cover its promo outlay, "
+                f"beyond the {cfg['breakeven_months_threshold']}-month coverage ceiling. And revenue "
+                f"coverage is not profit: {modeled}. Model contribution margin and working capital "
+                f"before committing."
             )
-            verdict_detail = "breakeven exceeded"
+            verdict_detail = "slow coverage + thin launch economics"
         else:
-            best = min(combined, key=lambda x: x["payback_months"])
             verdict = (
-                f"All retailer launches break even within {cfg['breakeven_months_threshold']} months. "
-                f"Fastest payback: {best['retailer_name']} in {_fmt_months(best['payback_months'])} "
-                f"({best['roi_multiple']:.1f}× ROI on promo spend). "
-                f"Current launch economics are within range."
+                f"Revenue covers promo spend fast — even the slowest of your retailers "
+                f"({worst['retailer_name']}) recovers its promo outlay in "
+                f"{_fmt_months(worst['coverage_months'])} of revenue. But revenue coverage is not "
+                f"profit: {modeled}. Judge a launch on contribution margin and cash runway, not on "
+                f"how fast sales cover the promo check."
             )
-            verdict_detail = "all launches affordable"
+            verdict_detail = "revenue covers promo fast — profit is the real test"
 
         chart_data = ChartData(
             type="bar",
-            title="Promo investment vs. revenue by retailer",
+            title="Revenue-to-promo coverage ratio by retailer",
             data=[
                 {
                     "retailer": r["retailer_name"],
-                    "roi_multiple": round(r["roi_multiple"], 2),
-                    "payback_months": round(r["payback_months"], 1),
+                    "revenue_to_promo": round(r["revenue_to_promo"], 2),
+                    "coverage_months": round(r["coverage_months"], 1),
                 }
                 for r in combined[:8]
             ],
             x_key="retailer",
-            y_key="roi_multiple",
-            unit="multiple",
+            y_key="revenue_to_promo",
+            unit="×",
         )
 
         return VerdictResponse(
@@ -124,25 +143,27 @@ class RetailerLaunchCostQuestion(BaseQuestion):
             verdict_detail=verdict_detail,
             key_numbers=[
                 KeyNumber(
-                    label="Longest payback",
-                    value=_fmt_months(worst["payback_months"]),
+                    label="Slowest revenue-coverage",
+                    value=_fmt_months(worst["coverage_months"]),
                     context=worst["retailer_name"],
                 ),
                 KeyNumber(
-                    label="Threshold",
-                    value=f"{cfg['breakeven_months_threshold']} months",
-                    context="max acceptable payback",
+                    label="Modeled Year-1 net cash",
+                    value=f"-${abs(_MODELED_NET_CASH_YEAR1):,.0f}",
+                    context=f"on ${_MODELED_GROSS_YEAR1:,.0f} gross — Cost of Saying Yes launch model",
                 ),
                 KeyNumber(
                     label="Total promo investment",
-                    value=f"${sum(r['total_promo'] for r in combined):,.0f}",
+                    value=f"${total_promo_all:,.0f}",
                 ),
             ],
             chart=chart_data,
             rule_explanation=(
-                f"Payback = total promo investment ÷ average monthly revenue. "
-                f"Fires when any retailer's payback > {cfg['breakeven_months_threshold']} months. "
-                f"Thresholds from Cost of Saying Yes piece."
+                f"Revenue-coverage months = total promo investment ÷ average monthly revenue — a "
+                f"liquidity proxy, not profitability. Affordability depends on contribution margin and "
+                f"cash runway; the Cost of Saying Yes model puts year-one net cash at "
+                f"${_MODELED_NET_CASH_YEAR1:,.0f} on ${_MODELED_GROSS_YEAR1:,.0f} gross. "
+                f"Coverage ceiling: {cfg['breakeven_months_threshold']} months."
             ),
             go_deeper_link=self.meta().go_deeper_link,
             go_deeper_label=self.meta().source_piece,
