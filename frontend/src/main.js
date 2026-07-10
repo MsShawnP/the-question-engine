@@ -18,8 +18,13 @@ function renderQuestionList() {
   const container = $("question-list");
   container.innerHTML = "";
 
-  state.questions
-    .filter(q => !q.is_stub)  // hide TBD stubs in the list
+  const liveQuestions = state.questions.filter(q => !q.is_stub);  // hide TBD stubs
+
+  // Keep the headline count honest: show what actually renders, not a hardcoded total.
+  const countEl = $("question-count");
+  if (countEl) countEl.textContent = String(liveQuestions.length);
+
+  liveQuestions
     .forEach((q, i) => {
       const card = document.createElement("div");
       card.className = "question-card" + (q.is_stub ? " is-stub" : "");
