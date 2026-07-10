@@ -95,9 +95,10 @@ class RetailerLaunchCostQuestion(BaseQuestion):
         worst = combined[0]  # slowest revenue coverage
         cfg = _CFG
         total_promo_all = sum(r["total_promo"] for r in combined)
+        net_cash_str = f"-${abs(_MODELED_NET_CASH_YEAR1):,.0f}"
         modeled = (
             f"the Cost of Saying Yes model shows a launch of this size runs net-cash-negative in "
-            f"year one — about ${_MODELED_NET_CASH_YEAR1:,.0f} on ${_MODELED_GROSS_YEAR1:,.0f} of "
+            f"year one — about {net_cash_str} on ${_MODELED_GROSS_YEAR1:,.0f} of "
             f"gross revenue — once COGS, trade spend, and working capital are counted"
         )
 
@@ -162,7 +163,7 @@ class RetailerLaunchCostQuestion(BaseQuestion):
                 f"Revenue-coverage months = total promo investment ÷ average monthly revenue — a "
                 f"liquidity proxy, not profitability. Affordability depends on contribution margin and "
                 f"cash runway; the Cost of Saying Yes model puts year-one net cash at "
-                f"${_MODELED_NET_CASH_YEAR1:,.0f} on ${_MODELED_GROSS_YEAR1:,.0f} gross. "
+                f"-${abs(_MODELED_NET_CASH_YEAR1):,.0f} on ${_MODELED_GROSS_YEAR1:,.0f} gross. "
                 f"Coverage ceiling: {cfg['breakeven_months_threshold']} months."
             ),
             go_deeper_link=self.meta().go_deeper_link,
