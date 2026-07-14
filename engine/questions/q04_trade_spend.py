@@ -53,7 +53,7 @@ class TradeSpendQuestion(BaseQuestion):
             question="Where is my trade spend going?",
             short_label="Trade spend going where?",
             source_piece="Trade Spend Data Diagnostic",
-            go_deeper_link="/trade-spend-diagnostic",
+            go_deeper_link="https://lailarallc.com/trade-spend-diagnostic",
             scenario="distressed",
         )
 

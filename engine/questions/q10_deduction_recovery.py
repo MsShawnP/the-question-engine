@@ -62,7 +62,7 @@ class DeductionRecoveryQuestion(BaseQuestion):
             question="Am I leaving deduction money on the table?",
             short_label="Leaving deduction money?",
             source_piece="Retailer Deduction Recovery",
-            go_deeper_link="/retailer-deduction-recovery",
+            go_deeper_link="https://lailarallc.com/retailer-deduction-recovery",
             scenario="baseline",
         )
 

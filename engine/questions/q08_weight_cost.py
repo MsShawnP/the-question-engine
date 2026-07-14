@@ -60,7 +60,7 @@ class WeightCostQuestion(BaseQuestion):
             question="What does one wrong weight cost?",
             short_label="Cost of wrong weight?",
             source_piece="Dimension & Weight Integrity",
-            go_deeper_link="/dimension-weight-integrity",
+            go_deeper_link="https://lailarallc.com/dimension-weight-integrity",
             scenario="baseline",
         )
 

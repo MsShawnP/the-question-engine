@@ -81,7 +81,7 @@ class ProductDataPreflightQuestion(BaseQuestion):
             question="Is my product data going to break at Walmart?",
             short_label="Product data Walmart-ready?",
             source_piece="Product Data Health Audit",
-            go_deeper_link="/product-data-health-audit",
+            go_deeper_link="https://lailarallc.com/product-data-health-audit",
             scenario="baseline",
         )
 

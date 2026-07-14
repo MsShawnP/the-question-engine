@@ -63,7 +63,7 @@ class RetailerLaunchCostQuestion(BaseQuestion):
             question="Can I afford this retailer launch?",
             short_label="Afford the retailer launch?",
             source_piece="Cost of Saying Yes",
-            go_deeper_link="/cost-of-saying-yes",
+            go_deeper_link="https://lailarallc.com/cost-of-saying-yes",
             scenario="baseline",
         )
 

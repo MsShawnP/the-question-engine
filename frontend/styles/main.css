@@ -277,7 +277,13 @@ main {
 }
 
 /* Go deeper */
-.go-deeper { margin-bottom: 48px; }
+.go-deeper {
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 .go-deeper-link {
   display: inline-block;
   background: var(--navy);
@@ -292,6 +298,42 @@ main {
 .go-deeper-link:hover {
   background: var(--navy-hover);
   color: #fff;
+}
+.pdf-download-link {
+  display: inline-block;
+  border: 1px solid var(--navy);
+  color: var(--navy);
+  padding: 11px 24px;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+.pdf-download-link:hover {
+  background: var(--navy);
+  color: #fff;
+}
+
+/* Card PDF link */
+.card-pdf-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--gridline);
+  border-radius: 2px;
+  padding: 4px 10px;
+  margin-left: 12px;
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.card-pdf-link:hover {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
 }
 
 /* Footer */

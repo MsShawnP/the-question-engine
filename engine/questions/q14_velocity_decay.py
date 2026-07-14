@@ -97,7 +97,7 @@ class VelocityDecayQuestion(BaseQuestion):
             question="Which SKUs are slowing down before the buyer notices?",
             short_label="SKU velocity decay?",
             source_piece="Velocity Decision Tool",
-            go_deeper_link="/velocity-decision-tool",
+            go_deeper_link="https://lailarallc.com/velocity-decision-tool",
             scenario="baseline",
         )
 

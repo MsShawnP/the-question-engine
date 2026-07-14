@@ -55,7 +55,7 @@ class SkuRationalizationQuestion(BaseQuestion):
             question="Which SKUs should die?",
             short_label="SKUs to kill?",
             source_piece="SKU Rationalization Framework",
-            go_deeper_link="/sku-rationalization",
+            go_deeper_link="https://lailarallc.com/sku-rationalization",
             scenario="baseline",
         )
 

@@ -66,7 +66,7 @@ class BiggestCustomerQuestion(BaseQuestion):
             question="Should I fire my biggest customer?",
             short_label="Fire your biggest account?",
             source_piece="Retailer Scorecard & Renegotiation Simulator",
-            go_deeper_link="/retailer-scorecard",
+            go_deeper_link="https://lailarallc.com/retailer-scorecard",
             scenario="baseline",
         )
 

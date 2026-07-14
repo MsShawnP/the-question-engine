@@ -15,7 +15,7 @@ class RecallCostQuestion(BaseQuestion):
             question="What would a recall cost me?",
             short_label="What would a recall cost?",
             source_piece="Recall Blast Radius",
-            go_deeper_link="/recall-blast-radius",
+            go_deeper_link="https://lailarallc.com/recall-blast-radius",
             scenario="distressed",
             is_stub=True,
         )

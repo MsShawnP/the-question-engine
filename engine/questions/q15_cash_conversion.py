@@ -83,7 +83,7 @@ class CashConversionQuestion(BaseQuestion):
             question="Why is cash tight when sales are up?",
             short_label="Why is cash tight?",
             source_piece="Contract-to-Cash Lifecycle",
-            go_deeper_link="/contract-to-cash",
+            go_deeper_link="https://lailarallc.com/contract-to-cash",
             scenario="baseline",
         )
 

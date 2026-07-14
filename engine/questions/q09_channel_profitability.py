@@ -39,7 +39,7 @@ class ChannelProfitabilityQuestion(BaseQuestion):
             question="Which channel actually makes money?",
             short_label="Which channel makes money?",
             source_piece="Channel Profitability Analysis",
-            go_deeper_link="/channel-profitability",
+            go_deeper_link="https://lailarallc.com/channel-profitability",
             scenario="baseline",
         )
 

@@ -65,7 +65,7 @@ class ForecastAccuracyQuestion(BaseQuestion):
             question="Can I trust my own forecast?",
             short_label="Forecast trustworthy?",
             source_piece="Production Demand Forecast",
-            go_deeper_link="/production-demand-forecast",
+            go_deeper_link="https://lailarallc.com/production-demand-forecast",
             scenario="baseline",
         )
 

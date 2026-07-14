@@ -57,7 +57,7 @@ class OtifExposureQuestion(BaseQuestion):
             question="Am I about to get hit with OTIF penalties I can't see?",
             short_label="OTIF penalty exposure?",
             source_piece="OTIF Blind Spot",
-            go_deeper_link="/otif-blind-spot",
+            go_deeper_link="https://lailarallc.com/otif-blind-spot",
             scenario="baseline",
         )
 

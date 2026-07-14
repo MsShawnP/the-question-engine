@@ -87,7 +87,7 @@ class StockoutCostQuestion(BaseQuestion):
             question="What did the orders I couldn't fill actually cost me?",
             short_label="Stockout cost?",
             source_piece="The 150 Cases You Didn't Ship",
-            go_deeper_link="/the-150-cases-you-didnt-ship",
+            go_deeper_link="https://lailarallc.com/the-150-cases-you-didnt-ship",
             scenario="baseline",
         )
 

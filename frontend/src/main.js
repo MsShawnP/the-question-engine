@@ -31,9 +31,13 @@ function renderQuestionList() {
       card.innerHTML = `
         <span class="question-text">${q.question}</span>
         <span class="question-meta">${q.source_piece}</span>
+        <a class="card-pdf-link" href="/api/pdf/${q.id}" download title="Download one-pager (PDF)">PDF</a>
       `;
       if (!q.is_stub) {
-        card.addEventListener("click", () => loadVerdict(q.id));
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".card-pdf-link")) return;  // let PDF download through
+          loadVerdict(q.id);
+        });
       }
       container.appendChild(card);
     });
@@ -69,6 +73,7 @@ function renderVerdict(v) {
   $("rule-explanation").textContent  = v.rule_explanation;
   $("go-deeper-link").textContent    = `Go deeper: ${v.go_deeper_label} →`;
   $("go-deeper-link").href           = v.go_deeper_link;
+  $("pdf-download-link").href        = `/api/pdf/${v.question_id}`;
   $("chart-title").textContent       = v.chart?.title || "";
 
   const knContainer = $("key-numbers");
