@@ -110,4 +110,6 @@ if (nzchar(params$key_numbers_tex)) {
 
 \vspace{0.5in}
 
+\footnotesize\textcolor{textsec}{Data: Cinderhaven Provisions, a synthetic demonstration dataset (not a client).}
+
 \footnotesize\textcolor{textsec}{Built by Lailara LLC --- data hygiene and analytics consulting for specialty food brands scaling into national retail. lailarallc.com}
