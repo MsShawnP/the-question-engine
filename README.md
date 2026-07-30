@@ -28,7 +28,7 @@ Deliberately not an LLM. Every verdict is produced by explicit, readable rules w
 | Q14 | Which SKUs are losing velocity? | Velocity Decay |
 | Q15 | What is my cash conversion cycle? | Cash Conversion |
 
-13 verdicts live; Q05 and Q06 return 503 pending their source pieces (EDI Reconciliation v2, Recall Blast Radius).
+13 verdicts live; Q05 and Q06 link out to their now-live source tools (reconcile.lailarallc.com, recall.lailarallc.com) — their API verdicts intentionally 503 until native verdicts ship.
 
 ## Why it matters
 

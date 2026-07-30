@@ -18,22 +18,30 @@ function renderQuestionList() {
   const container = $("question-list");
   container.innerHTML = "";
 
-  const liveQuestions = state.questions.filter(q => !q.is_stub);  // hide TBD stubs
+  const liveQuestions = state.questions.filter(q => !q.is_stub);
 
   // Keep the headline count honest: show what actually renders, not a hardcoded total.
   const countEl = $("question-count");
   if (countEl) countEl.textContent = String(liveQuestions.length);
 
-  liveQuestions
-    .forEach((q, i) => {
+  // Stubs render too — as outbound cards to their live source tools, not dead
+  // buttons. Their verdict endpoints intentionally 503 until native verdicts ship.
+  state.questions
+    .forEach((q) => {
       const card = document.createElement("div");
       card.className = "question-card" + (q.is_stub ? " is-stub" : "");
-      card.innerHTML = `
-        <span class="question-text">${q.question}</span>
-        <span class="question-meta">${q.source_piece}</span>
-        <a class="card-pdf-link" href="/api/pdf/${q.id}" download title="Download one-pager (PDF)">PDF</a>
-      `;
-      if (!q.is_stub) {
+      if (q.is_stub) {
+        card.innerHTML = `
+          <span class="question-text">${q.question}</span>
+          <span class="question-meta">${q.source_piece}</span>
+          <a class="card-pdf-link" href="${q.go_deeper_link}" target="_blank" rel="noopener" title="Open the full tool">Full tool →</a>
+        `;
+      } else {
+        card.innerHTML = `
+          <span class="question-text">${q.question}</span>
+          <span class="question-meta">${q.source_piece}</span>
+          <a class="card-pdf-link" href="/api/pdf/${q.id}" download title="Download one-pager (PDF)">PDF</a>
+        `;
         card.addEventListener("click", (e) => {
           if (e.target.closest(".card-pdf-link")) return;  // let PDF download through
           loadVerdict(q.id);

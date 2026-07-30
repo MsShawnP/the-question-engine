@@ -146,7 +146,7 @@ main {
   border-color: var(--navy);
 }
 .question-card.is-stub {
-  opacity: 0.45;
+  opacity: 0.8;
   cursor: default;
 }
 .question-text {
@@ -161,7 +161,7 @@ main {
   margin-left: 16px;
 }
 .question-card.is-stub .question-meta::after {
-  content: " — coming soon";
+  content: " — answered by the full tool";
 }
 
 /* Verdict panel */

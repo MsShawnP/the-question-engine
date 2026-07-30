@@ -15,7 +15,7 @@ class EdiReconciliationQuestion(BaseQuestion):
             question="Why don't my numbers match my distributor's?",
             short_label="Numbers vs. distributor?",
             source_piece="EDI Reconciliation Tool",
-            go_deeper_link="https://lailarallc.com/edi-reconciliation",
+            go_deeper_link="https://reconcile.lailarallc.com",
             scenario="baseline",
             is_stub=True,
         )
