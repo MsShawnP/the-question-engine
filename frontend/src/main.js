@@ -18,11 +18,12 @@ function renderQuestionList() {
   const container = $("question-list");
   container.innerHTML = "";
 
-  const liveQuestions = state.questions.filter(q => !q.is_stub);
-
-  // Keep the headline count honest: show what actually renders, not a hardcoded total.
+  // Keep the headline count honest: the hero says "Fifteen"; if the catalog
+  // ever renders a different number of cards, show that numeral instead.
   const countEl = $("question-count");
-  if (countEl) countEl.textContent = String(liveQuestions.length);
+  if (countEl && state.questions.length !== 15) {
+    countEl.textContent = String(state.questions.length);
+  }
 
   // Stubs render too — as outbound cards to their live source tools, not dead
   // buttons. Their verdict endpoints intentionally 503 until native verdicts ship.

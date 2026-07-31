@@ -8,7 +8,7 @@ questions:
     question: "Should I fire my biggest customer?"
     short_label: "Fire your biggest account?"
     source_piece: "Retailer Scorecard & Renegotiation Simulator"
-    go_deeper_link: "https://lailarallc.com/retailer-scorecard"
+    go_deeper_link: "https://retailer-scorecard.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -16,7 +16,7 @@ questions:
     question: "Can I afford this retailer launch?"
     short_label: "Afford the retailer launch?"
     source_piece: "Cost of Saying Yes"
-    go_deeper_link: "https://lailarallc.com/cost-of-saying-yes"
+    go_deeper_link: "https://launch-cost.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -24,7 +24,7 @@ questions:
     question: "Which SKUs should die?"
     short_label: "SKUs to kill?"
     source_piece: "SKU Rationalization Framework"
-    go_deeper_link: "https://lailarallc.com/sku-rationalization"
+    go_deeper_link: "https://sku.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -32,7 +32,7 @@ questions:
     question: "Where is my trade spend going?"
     short_label: "Trade spend going where?"
     source_piece: "Trade Spend Data Diagnostic"
-    go_deeper_link: "https://lailarallc.com/trade-spend-diagnostic"
+    go_deeper_link: "https://trade-spend.lailarallc.com"
     scenario: distressed        # matches linked piece — do not change without updating that piece
     is_stub: false
 
@@ -40,7 +40,7 @@ questions:
     question: "Why don't my numbers match my distributor's?"
     short_label: "Numbers vs. distributor?"
     source_piece: "EDI Reconciliation Tool"
-    go_deeper_link: "https://lailarallc.com/edi-reconciliation"
+    go_deeper_link: "https://reconcile.lailarallc.com"
     scenario: baseline
     is_stub: true               # depends on EDI Reconciliation v2
 
@@ -48,7 +48,7 @@ questions:
     question: "What would a recall cost me?"
     short_label: "What would a recall cost?"
     source_piece: "Recall Blast Radius"
-    go_deeper_link: "https://lailarallc.com/recall-blast-radius"
+    go_deeper_link: "https://recall.lailarallc.com"
     scenario: distressed
     is_stub: true               # depends on Recall Blast Radius piece
 
@@ -56,7 +56,7 @@ questions:
     question: "Is my product data going to break at Walmart?"
     short_label: "Product data Walmart-ready?"
     source_piece: "Product Data Health Audit"
-    go_deeper_link: "https://lailarallc.com/product-data-health-audit"
+    go_deeper_link: "https://audit.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -64,7 +64,7 @@ questions:
     question: "What does one wrong weight cost?"
     short_label: "Cost of wrong weight?"
     source_piece: "Dimension & Weight Integrity"
-    go_deeper_link: "https://lailarallc.com/dimension-weight-integrity"
+    go_deeper_link: "https://dimensions.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -72,7 +72,7 @@ questions:
     question: "Which channel actually makes money?"
     short_label: "Which channel makes money?"
     source_piece: "Channel Profitability Analysis"
-    go_deeper_link: "https://lailarallc.com/channel-profitability"
+    go_deeper_link: "https://channels.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -80,7 +80,7 @@ questions:
     question: "Am I leaving deduction money on the table?"
     short_label: "Leaving deduction money?"
     source_piece: "Retailer Deduction Recovery"
-    go_deeper_link: "https://lailarallc.com/retailer-deduction-recovery"
+    go_deeper_link: "https://deductions.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -88,7 +88,7 @@ questions:
     question: "What did the orders I couldn't fill actually cost me?"
     short_label: "Stockout cost?"
     source_piece: "The 150 Cases You Didn't Ship"
-    go_deeper_link: "https://lailarallc.com/the-150-cases-you-didnt-ship"
+    go_deeper_link: "https://shortships.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -96,7 +96,7 @@ questions:
     question: "Can I trust my own forecast?"
     short_label: "Forecast trustworthy?"
     source_piece: "Production Demand Forecast"
-    go_deeper_link: "https://lailarallc.com/production-demand-forecast"
+    go_deeper_link: "https://forecast.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -104,7 +104,7 @@ questions:
     question: "Am I about to get hit with OTIF penalties I can't see?"
     short_label: "OTIF penalty exposure?"
     source_piece: "OTIF Blind Spot"
-    go_deeper_link: "https://lailarallc.com/otif-blind-spot"
+    go_deeper_link: "https://otif.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -112,7 +112,7 @@ questions:
     question: "Which SKUs are slowing down before the buyer notices?"
     short_label: "SKU velocity decay?"
     source_piece: "Velocity Decision Tool"
-    go_deeper_link: "https://lailarallc.com/velocity-decision-tool"
+    go_deeper_link: "https://velocity.lailarallc.com"
     scenario: baseline
     is_stub: false
 
@@ -120,6 +120,6 @@ questions:
     question: "Why is cash tight when sales are up?"
     short_label: "Why is cash tight?"
     source_piece: "Contract-to-Cash Lifecycle"
-    go_deeper_link: "https://lailarallc.com/contract-to-cash"
+    go_deeper_link: "https://cash.lailarallc.com"
     scenario: baseline
     is_stub: false
